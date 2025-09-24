@@ -1,0 +1,272 @@
+table 'Lead Time From Date'
+	lineageTag: 1d2d140c-2a64-45df-9c9e-b9374ac8ffbf
+	dataCategory: Time
+
+	column 'Lead Time From Date'
+		dataType: dateTime
+		isKey
+		formatString: d/mm/yyyy
+		lineageTag: 0d4be7cb-17fc-4be1-8316-ed57dc268048
+		summarizeBy: none
+		sourceColumn: Lead Time From Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation TabularEditor_MarkAsDateKey = 1
+
+	column 'Lead Time From Year'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0d355580-420b-411b-ac9d-67323d112332
+		summarizeBy: sum
+		sourceColumn: Lead Time From Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time From Quarter'
+		dataType: string
+		lineageTag: 6f4f84b9-d20b-4341-8307-390f95247130
+		summarizeBy: none
+		sourceColumn: Lead Time From Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time From Month'
+		dataType: int64
+		formatString: 0
+		lineageTag: 153f589a-b14d-4c10-b120-895381627e67
+		summarizeBy: sum
+		sourceColumn: Lead Time From Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time From Month Name'
+		dataType: string
+		lineageTag: ac7bc1b0-390f-44a1-8d67-760c3e31f130
+		summarizeBy: none
+		sourceColumn: Lead Time From Month Name
+		sortByColumn: 'Lead Time From Month'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time From Day'
+		dataType: int64
+		formatString: 0
+		lineageTag: 191229c2-1bab-4d3d-bc88-384cb672ee2c
+		summarizeBy: sum
+		sourceColumn: Lead Time From Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time From Day of Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: abc024b8-fd33-414e-a1f2-a4960fb0365f
+		summarizeBy: sum
+		sourceColumn: Lead Time From Day of Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time From Day of Week Name'
+		dataType: string
+		lineageTag: 0b37e3ad-d25b-4983-b42c-3cd54f90ace9
+		summarizeBy: none
+		sourceColumn: Lead Time From Day of Week Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time From Date Is Weekend'
+		dataType: string
+		lineageTag: a943715c-1d80-4ef8-92e6-9174adc03615
+		summarizeBy: none
+		sourceColumn: Lead Time From Date Is Weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time From Year-Month'
+		dataType: string
+		lineageTag: a656997e-313a-4ff9-abb7-72cfdd301bfa
+		summarizeBy: none
+		sourceColumn: Lead Time From Year-Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time From ISO Year'
+		dataType: int64
+		formatString: 0
+		displayFolder: ISO Week
+		lineageTag: 031a3a1e-d113-4681-8a79-240222275958
+		summarizeBy: none
+		sourceColumn: Lead Time From ISO Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time From ISO Week Number'
+		dataType: int64
+		formatString: 0
+		displayFolder: ISO Week
+		lineageTag: d04f372e-9068-4b82-a3e4-4f348338a4b1
+		summarizeBy: none
+		sourceColumn: Lead Time From ISO Week Number
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time From ISO Week'
+		dataType: string
+		displayFolder: ISO Week
+		lineageTag: df6c65aa-d797-4a38-aa64-7ff0252e4d17
+		summarizeBy: none
+		sourceColumn: Lead Time From ISO Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time To ISO Week Index'
+		dataType: int64
+		formatString: 0
+		displayFolder: ISO Week
+		lineageTag: e15c42bc-e43d-4e5c-956b-e3b48084ab87
+		summarizeBy: none
+		sourceColumn: Lead Time To ISO Week Index
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time From Date Index'
+		dataType: int64
+		formatString: 0
+		lineageTag: bf9e58ac-f478-4b8e-b06b-2c9e08a04cd8
+		summarizeBy: none
+		sourceColumn: Lead Time From Date Index
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Lead Time From Date (Y-M-D)'
+		lineageTag: 0e43d046-ad63-48b0-87a3-385b08eb98fa
+
+		level 'Lead Time From Year'
+			lineageTag: 5c8da396-1684-47b7-af27-76fa93599b0f
+			column: 'Lead Time From Year'
+
+		level 'Lead Time From Year-Month'
+			lineageTag: a5c92d03-89e0-40f9-bc21-a053cccd96bc
+			column: 'Lead Time From Year-Month'
+
+		level 'Lead Time From Date'
+			lineageTag: a59f907d-d041-4193-b9a5-f896e2f21ed5
+			column: 'Lead Time From Date'
+
+	hierarchy 'Lead Time From Date (Y-W-D)'
+		displayFolder: ISO Week
+		lineageTag: 66f47bd9-1943-4b18-8ffa-1ea407c536fa
+
+		level 'Lead Time From Date'
+			lineageTag: 233842a1-56fe-4342-98b2-ff562a4e85da
+			column: 'Lead Time From Date'
+
+	partition 'Lead Time From Date' = m
+		mode: import
+		source = ```
+				let
+				    // Define Start Date
+				    StartDate = #date(2023, 1, 1),
+				
+				    // Dynamically calculate the last day of next year
+				    CurrentYear = Date.Year(DateTime.FixedLocalNow()),
+				    EndDate = #date(CurrentYear + 1, 12, 31),
+				
+				    // Generate a List of Dates
+				    DateList = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+				
+				    // Convert List to Table
+				    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}),
+				
+				    // Add Basic Date Info
+				    AddYear = Table.AddColumn(DateTable, "Year", each Date.Year([Date]), Int64.Type),
+				    AddQuarter = Table.AddColumn(AddYear, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date]))),
+				    AddMonth = Table.AddColumn(AddQuarter, "Month", each Date.Month([Date]), Int64.Type),
+				    AddMonthName = Table.AddColumn(AddMonth, "Month Name", each Date.ToText([Date], "MMMM")),
+				    AddDay = Table.AddColumn(AddMonthName, "Day", each Date.Day([Date]), Int64.Type),
+				    AddDayOfWeek = Table.AddColumn(AddDay, "Day of Week", each Date.DayOfWeek([Date]) + 1, Int64.Type),
+				    AddDayOfWeekName = Table.AddColumn(AddDayOfWeek, "Day of Week Name", each Date.ToText([Date], "dddd")),
+				    AddIsWeekend = Table.AddColumn(AddDayOfWeekName, "Is Weekend", each if Date.DayOfWeek([Date]) >= 5 then "Yes" else "No"),
+				    AddYearMonth = Table.AddColumn(AddIsWeekend, "Year-Month", each Text.From(Date.Year([Date])) & "-" & Text.PadStart(Text.From(Date.Month([Date])), 2, "0")),
+				
+				    // Add ISO Year
+				    AddISOYear = Table.AddColumn(AddYearMonth, "Lead Time From ISO Year", each 
+				        let
+				            d = [Date],
+				            dayOfWeek = Date.DayOfWeek(d, Day.Monday),
+				            nearestThursday = Date.AddDays(d, 3 - dayOfWeek)
+				        in
+				            Date.Year(nearestThursday), Int64.Type),
+				
+				    // Add ISO Week Number
+				    AddISOWeekNumber = Table.AddColumn(AddISOYear, "Lead Time From ISO Week Number", each 
+				        let
+				            d = [Date],
+				            dayOfWeek = Date.DayOfWeek(d, Day.Monday),
+				            nearestThursday = Date.AddDays(d, 3 - dayOfWeek)
+				        in
+				            Date.WeekOfYear(nearestThursday, Day.Monday), Int64.Type),
+				
+				    // Add ISO Week Formatted
+				    AddISOWeek = Table.AddColumn(AddISOWeekNumber, "Lead Time From ISO Week", each 
+				        let
+				            d = [Date],
+				            dayOfWeek = Date.DayOfWeek(d, Day.Monday),
+				            nearestThursday = Date.AddDays(d, 3 - dayOfWeek),
+				            isoYear = Date.Year(nearestThursday),
+				            isoWeekNumber = Date.WeekOfYear(nearestThursday, Day.Monday),
+				            WeekStartDate = Date.StartOfWeek(d, Day.Monday),
+				            WeekEndDate = Date.AddDays(WeekStartDate, 6)
+				        in
+				            Text.From(isoYear) & "-W" & Text.PadStart(Text.From(isoWeekNumber), 2, "0") 
+				            & " (" & Date.ToText(WeekStartDate, "dd/MM/yyyy") 
+				            & " - " & Date.ToText(WeekEndDate, "dd/MM/yyyy") & ")"
+				    ),
+				
+				    // Add ISO Week Index (today's ISO week = 0)
+				    Today = Date.From(DateTime.FixedLocalNow()),
+				    TodayDow = Date.DayOfWeek(Today, Day.Monday),
+				    TodayNearestThursday = Date.AddDays(Today, 3 - TodayDow),
+				    CurrentISOYear = Date.Year(TodayNearestThursday),
+				    CurrentISOWeek = Date.WeekOfYear(TodayNearestThursday, Day.Monday),
+				    AddISOWeekIndex = Table.AddColumn(AddISOWeek, "Lead Time To ISO Week Index", each 
+				        let
+				            d = [Date],
+				            dow = Date.DayOfWeek(d, Day.Monday),
+				            nearestThursday = Date.AddDays(d, 3 - dow),
+				            isoYear = Date.Year(nearestThursday),
+				            isoWeek = Date.WeekOfYear(nearestThursday, Day.Monday)
+				        in
+				            (isoYear - CurrentISOYear) * 52 + (isoWeek - CurrentISOWeek), Int64.Type),
+				
+				    // Rename Columns
+				    #"Renamed Columns" = Table.RenameColumns(AddISOWeekIndex, {
+				        {"Date", "Lead Time From Date"}, 
+				        {"Year", "Lead Time From Year"}, 
+				        {"Quarter", "Lead Time From Quarter"}, 
+				        {"Month", "Lead Time From Month"}, 
+				        {"Month Name", "Lead Time From Month Name"}, 
+				        {"Day", "Lead Time From Day"}, 
+				        {"Day of Week", "Lead Time From Day of Week"}, 
+				        {"Day of Week Name", "Lead Time From Day of Week Name"}, 
+				        {"Is Weekend", "Lead Time From Date Is Weekend"}, 
+				        {"Year-Month", "Lead Time From Year-Month"}
+				    }),
+				
+				    // Change Data Types
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns", {{"Lead Time From Date", type date}}),
+				
+				    // Add Lead Time To Date Index (relative to today)
+				    TodayDate = Date.From(DateTime.FixedLocalNow()),
+				    AddRelativeIndex = Table.AddColumn(#"Changed Type", "Lead Time From Date Index", each Duration.Days([Lead Time From Date] - TodayDate), Int64.Type)
+				in
+				    AddRelativeIndex
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

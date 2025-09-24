@@ -1,0 +1,157 @@
+table 'Closed At Date'
+	isHidden
+	lineageTag: 1eaddbfe-17d6-44d3-8149-ccd911e2562e
+	dataCategory: Time
+
+	column 'Closed At Date'
+		dataType: dateTime
+		isKey
+		formatString: Short Date
+		lineageTag: 5db8e866-b00d-4825-aa62-88fac2398156
+		summarizeBy: none
+		sourceColumn: Closed At Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation TabularEditor_MarkAsDateKey = 1
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Closed At Year'
+		dataType: int64
+		formatString: 0
+		lineageTag: 228a7ffc-bb07-44bd-9d53-71de8067c394
+		summarizeBy: sum
+		sourceColumn: Closed At Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Closed At Quarter'
+		dataType: string
+		lineageTag: 1474eac3-244d-4bb0-8ecf-9e5d0a62936f
+		summarizeBy: none
+		sourceColumn: Closed At Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Closed At Month'
+		dataType: int64
+		formatString: 0
+		lineageTag: 4d198016-3fb6-484a-8112-ccc51fe2c029
+		summarizeBy: sum
+		sourceColumn: Closed At Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Closed At Month Name'
+		dataType: string
+		lineageTag: 8d1a7583-e017-4660-9716-11d6c7be6a91
+		summarizeBy: none
+		sourceColumn: Closed At Month Name
+		sortByColumn: 'Closed At Month'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Closed At Day'
+		dataType: int64
+		formatString: 0
+		lineageTag: 83c21efd-6745-47e6-8f6f-cb738b8ae994
+		summarizeBy: sum
+		sourceColumn: Closed At Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Closed At Day of Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: c3072acd-ee34-4e83-a753-17a8cf3ac2a1
+		summarizeBy: sum
+		sourceColumn: Closed At Day of Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Closed At Day of Week Name'
+		dataType: string
+		lineageTag: 572eeab0-0c67-4502-a1be-5471640cfeca
+		summarizeBy: none
+		sourceColumn: Closed At Day of Week Name
+		sortByColumn: 'Closed At Day of Week'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Closed At Is Weekend'
+		dataType: string
+		lineageTag: 73a33e71-9c6b-4cbd-9e2a-09565bec781a
+		summarizeBy: none
+		sourceColumn: Closed At Is Weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Closed At Year-Month'
+		dataType: string
+		lineageTag: d2709249-9d7b-4134-b36f-b34b9fe436e9
+		summarizeBy: none
+		sourceColumn: Closed At Year-Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Closed At ISO Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: a8a6b50e-01e3-4ff7-9542-020e7e8263a9
+		summarizeBy: sum
+		sourceColumn: Closed At ISO Week
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Closed At Date (Y-M-D)'
+		lineageTag: 3d075bcf-1cd4-475d-9ec4-3471d0a45634
+
+		level 'Closed At Year'
+			lineageTag: ee38b526-34b6-48f3-a50f-3a6e3deb6cc2
+			column: 'Closed At Year'
+
+		level 'Closed At Month'
+			lineageTag: 5eff4654-2840-4d69-80c9-4eac07ec130f
+			column: 'Closed At Month'
+
+		level 'Closed At Date'
+			lineageTag: 6d20981a-8882-4685-8365-d2f6d0f17c99
+			column: 'Closed At Date'
+
+	partition 'Closed At Date' = m
+		mode: import
+		source =
+				let
+				    // Define Start and End Dates
+				    StartDate = #date(2020, 1, 1),
+				    EndDate = #date(2030, 12, 31),
+				
+				    // Generate a List of Dates
+				    DateList = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+				
+				    // Convert List to Table
+				    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}),
+				
+				    // Add Additional Date Columns
+				    AddYear = Table.AddColumn(DateTable, "Year", each Date.Year([Date]), Int64.Type),
+				    AddQuarter = Table.AddColumn(AddYear, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date]))),
+				    AddMonth = Table.AddColumn(AddQuarter, "Month", each Date.Month([Date]), Int64.Type),
+				    AddMonthName = Table.AddColumn(AddMonth, "Month Name", each Date.ToText([Date], "MMMM")),
+				    AddDay = Table.AddColumn(AddMonthName, "Day", each Date.Day([Date]), Int64.Type),
+				    AddDayOfWeek = Table.AddColumn(AddDay, "Day of Week", each Date.DayOfWeek([Date]) + 1, Int64.Type),
+				    AddDayOfWeekName = Table.AddColumn(AddDayOfWeek, "Day of Week Name", each Date.ToText([Date], "dddd")),
+				    AddIsWeekend = Table.AddColumn(AddDayOfWeekName, "Is Weekend", each if Date.DayOfWeek([Date]) >= 5 then "Yes" else "No"),
+				    AddYearMonth = Table.AddColumn(AddIsWeekend, "Year-Month", each Text.From(Date.Year([Date])) & "-" & Text.PadStart(Text.From(Date.Month([Date])), 2, "0")),
+				
+				    // Add ISO Week
+				    AddISOWeek = Table.AddColumn(AddYearMonth, "ISO Week", each Date.WeekOfYear([Date], Day.Monday), Int64.Type),
+				    #"Changed Type" = Table.TransformColumnTypes(AddISOWeek,{{"Date", type date}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Date", "Closed At Date"}, {"Year", "Closed At Year"}, {"Quarter", "Closed At Quarter"}, {"Month", "Closed At Month"}, {"Month Name", "Closed At Month Name"}, {"Day", "Closed At Day"}, {"Day of Week", "Closed At Day of Week"}, {"Day of Week Name", "Closed At Day of Week Name"}, {"Is Weekend", "Closed At Is Weekend"}, {"Year-Month", "Closed At Year-Month"}, {"ISO Week", "Closed At ISO Week"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

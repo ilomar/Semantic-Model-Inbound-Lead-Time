@@ -1,0 +1,3221 @@
+table 'Lead Time Events Measures'
+	lineageTag: e74c2e10-e62d-420c-82f8-de50184c8d84
+
+	defaultDetailRowsDefinition = ```
+			    SELECTCOLUMNS(
+			        'Lead Time Events Measures',
+			        "Company", RELATED('Company'[Company]),
+			        "Order No.", RELATED('Order'[Order No.]),
+			        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+			        "Customer Code", RELATED('Customer'[Customer Code]),
+			        "Customer Name", RELATED('Customer'[Customer Name]),
+			        "Freight Type", RELATED('Freight Type'[Freight Type]),
+			        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+			        "ETA Date", RELATED('ETA Date'[ETA Date]),     
+			        "ATA Date", RELATED('ATA Date'[ATA Date]),
+			        "Advise Date", RELATED('Advise Date'[Advise Date]),
+			        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+			        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+			        "Order Date", RELATED('Order Date'[Order Date]),
+			        "Release Date", RELATED('Release Date'[Release Date]),
+			        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+			        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+			        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+			        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+			)
+			```
+
+	measure 'Container Count' =
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+		formatString: #,##0
+		displayFolder: Container Count
+		lineageTag: 2555c0f4-d1b0-447b-8896-922b9059f989
+
+		detailRowsDefinition = ```
+				    SELECTCOLUMNS(
+				        FILTER(
+				        'Lead Time Events Measures',
+				        RELATED('Freight Type'[Freight Type]) = "Containers" &&
+				        RELATED('Terminal'[Own Site]) = TRUE
+				    )  ,  
+				    
+				
+				    "Company", RELATED('Company'[Company]),
+				    "Order Creation Date", [OrderCreationDate],
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				    "Customer Code", RELATED('Customer'[Customer Code]),
+				    "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),       
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "TMS Full Pickup Date",  'Lead Time Events Measures'[TMSFullPickupDate],
+				    "TMS Full Pickup Location", RELATED('TMS Full Pickup Location'[TMS Full Pickup Address Name]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Empty Return Location", RELATED('TMS Empty Return Location'[TMS Empty Return Address Name]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+		changedProperty = IsHidden
+
+	measure 'Containers to Unload' =
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    NOT(ISBLANK('Lead Time Events Measures'[FromDate])),
+			    ISBLANK('Lead Time Events Measures'[ToDate]),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    'Lead Time Events Measures'[LeadTimeEvent] = "ATA_Unloading"
+			)
+		formatString: #,##0
+		displayFolder: Container Count
+		lineageTag: c1bf4940-efb2-43b7-a91f-25a54e179f20
+
+		detailRowsDefinition =
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				        ISBLANK('Lead Time Events Measures'[ToDate]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_Unloading" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+
+	measure 'Containers Empty Returned' =
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    NOT(ISBLANK('Lead Time Events Measures'[FromDate])),
+			    ISBLANK('Lead Time Events Measures'[ToDate]),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    'Lead Time Events Measures'[LeadTimeEvent] = "ATA_EmptyReturn"
+			)
+		formatString: #,##0
+		displayFolder: Container Count
+		lineageTag: 178f64aa-90c1-45d2-bae0-26a30fbadde8
+
+		detailRowsDefinition = ```
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				        ISBLANK('Lead Time Events Measures'[ToDate]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_EmptyReturn" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),    
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Active Container Count' =
+			CALCULATE(
+			   [Container Count],
+			    FILTER(
+			        'Lead Time Events Measures',
+			        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+			        'Lead Time Events Measures'[FromDate] <= MIN(MAX('Date'[Date]), TODAY()) &&
+			        (ISBLANK('Lead Time Events Measures'[ToDate]) || 'Lead Time Events Measures'[ToDate] > MIN(MAX('Date'[Date]), TODAY())) &&
+			        NOT(ISBLANK('Lead Time Events Measures'[SK_LeadTime_Container]))
+			    )
+			)
+		formatString: #,##0
+		isHidden
+		lineageTag: 00c29ee2-1911-4958-a953-6927322552b4
+
+		detailRowsDefinition = ```
+				    SELECTCOLUMNS(
+				      FILTER(
+				        'Lead Time Events Measures',
+				        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				        'Lead Time Events Measures'[FromDate] <= MIN(MAX('Date'[Date]), TODAY()) &&
+				        (ISBLANK('Lead Time Events Measures'[ToDate]) || 'Lead Time Events Measures'[ToDate] >= MIN(MAX('Date'[Date]), TODAY())) &&
+				        NOT(ISBLANK('Lead Time Events Measures'[SK_LeadTime_Container])) &&
+				        RELATED('Freight Type'[Freight Type]) = "Containers" &&
+				        RELATED('Terminal'[Own Site]) = TRUE
+				    )  ,
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ETA Date", RELATED('ETA Date'[ETA Date]),
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Average Lead Time' = ```
+			// AVERAGE('Lead Time Events Measures'[LeadTime])
+			
+			CALCULATE(
+			    AVERAGE('Lead Time Events Measures'[LeadTimeCalendarDays]),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+			
+			```
+		formatString: #,##0.0
+		isHidden
+		lineageTag: 1b81b8eb-460d-42e2-abff-4e261f7caae7
+
+	measure 'Active Avg. Lead Time' =
+			CALCULATE(
+			   [Average Lead Time],
+			    FILTER(
+			        'Lead Time Events Measures',
+			        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+			        'Lead Time Events Measures'[FromDate] <= MIN(MAX('Date'[Date]), TODAY()) &&
+			        (ISBLANK('Lead Time Events Measures'[ToDate]) || 'Lead Time Events Measures'[ToDate] > MIN(MAX('Date'[Date]), TODAY())) &&
+			        NOT(ISBLANK('Lead Time Events Measures'[SK_LeadTime_Container]))
+			    )
+			)
+		formatString: #,##0
+		isHidden
+		lineageTag: 8d8c6bab-14b7-4c73-af54-0b44064e8e96
+
+		detailRowsDefinition = ```
+				    SELECTCOLUMNS(
+				      FILTER(
+				        'Lead Time Events Measures',
+				        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				        'Lead Time Events Measures'[FromDate] <= MIN(MAX('Date'[Date]), TODAY()) &&
+				        (ISBLANK('Lead Time Events Measures'[ToDate]) || 'Lead Time Events Measures'[ToDate] > MIN(MAX('Date'[Date]), TODAY())) &&
+				        NOT(ISBLANK('Lead Time Events Measures'[SK_LeadTime_Container])) &&
+				        RELATED('Freight Type'[Freight Type]) = "Containers" &&
+				        RELATED('Terminal'[Own Site]) = TRUE
+				    )  ,
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Active Events' =
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    FILTER(
+			        'Lead Time Events Measures',
+			        'Lead Time Events Measures'[FromDate] <= SELECTEDVALUE('Date'[Date]) &&
+			        'Lead Time Events Measures'[ToDate] >= SELECTEDVALUE('Date'[Date])
+			    )
+			)
+		isHidden
+		lineageTag: c6aedbbb-74d6-4953-ab41-f3296b9d0f32
+
+	measure 'Containers Arrived at Port by Date' = ```
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    FILTER(
+			        'Lead Time Events Measures',
+			        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+			        'Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) &&
+			        'Lead Time Events Measures'[LeadTimeEvent] = "ATA"
+			    )
+			    ,
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+			
+			```
+		formatString: #,##0
+		displayFolder: Historical Tracking
+		lineageTag: 54df8542-cf9e-40f6-a78b-93f800502fa5
+
+		detailRowsDefinition = ```
+				
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+				        'Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ATA" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ETA Date", RELATED('ETA Date'[ETA Date]),
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),        
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Containers Unloaded by Date' = ```
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    FILTER(
+			        'Lead Time Events Measures',
+			        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+			        'Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) &&
+			        'Lead Time Events Measures'[LeadTimeEvent] = "UnloadingDate"
+			    )
+			    ,
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+			
+			
+			```
+		formatString: #,##0
+		displayFolder: Historical Tracking
+		lineageTag: 4054c959-b5b7-4e8d-b84c-9cc47ee4623b
+
+		detailRowsDefinition = ```
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+				        'Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "UnloadingDate" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Containers Estimated to Arrive at Port in Next 7 Days by Date' =
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    FILTER(
+			        'Lead Time Events Measures',
+			        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) + 7 &&
+			        'Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) &&
+			        'Lead Time Events Measures'[LeadTimeEvent] = "ETA"
+			    )
+			    ,
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+		formatString: #,##0
+		displayFolder: Historical Tracking
+		lineageTag: e99b9b9e-4d03-40c0-b315-6f08c7bf3ee6
+
+		detailRowsDefinition = ```
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) +  7 &&
+				        'Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ETA" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	/// ETA Date
+	measure 'Containers Estimated to Arrive at Port by Date' =
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    FILTER(
+			        'Lead Time Events Measures',
+			        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+			        'Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) &&
+			        'Lead Time Events Measures'[LeadTimeEvent] = "ETA"
+			    )
+			    ,
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+		formatString: #,##0
+		displayFolder: Historical Tracking
+		lineageTag: fee63949-a0a8-444c-8465-1de032dd7a62
+
+		detailRowsDefinition = ```
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+				        'Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ETA" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ETA Date", RELATED('ETA Date'[ETA Date]),       
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Containers Ready for Unloading' =
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    NOT(ISBLANK('Lead Time Events Measures'[FromDate])),
+			    ISBLANK('Lead Time Events Measures'[ToDate]),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    'Lead Time Events Measures'[LeadTimeEvent] = "TMSFullDropOff_Unloading"
+			)
+		formatString: #,##0
+		displayFolder: Container Count
+		lineageTag: d4a35081-ca93-4812-9c6c-0d51f4e6e426
+
+		detailRowsDefinition =
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				        ISBLANK('Lead Time Events Measures'[ToDate]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "TMSFullDropOff_Unloading" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+
+	measure 'Containers Ready for Empty Return' =
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    NOT(ISBLANK('Lead Time Events Measures'[FromDate])),
+			    ISBLANK('Lead Time Events Measures'[ToDate]),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    'Lead Time Events Measures'[LeadTimeEvent] = "Unloading_EmptyReturn"
+			)
+		formatString: #,##0
+		displayFolder: Container Count
+		lineageTag: 5a37a125-d16a-47ac-866c-063faa70dd39
+
+		detailRowsDefinition =
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				        ISBLANK('Lead Time Events Measures'[ToDate]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "Unloading_EmptyReturn" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+
+	measure 'Avg Lead Time ATA to Unloading' =
+			CALCULATE(
+			    AVERAGE('Lead Time Events Measures'[LeadTimeCalendarDays]),
+			    'Lead Time Events Measures'[LeadTimeEvent] = "ATA_Unloading",
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+		formatString: #,##0.00
+		displayFolder: Duration
+		lineageTag: e2ae11eb-b7c6-49a2-aa78-ffeb5ffa7200
+
+	/// Based on TMS Full Drop Date
+	measure 'Containers Arrived at Warehouse by Date' = ```
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    FILTER(
+			        'Lead Time Events Measures',
+			        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+			        'Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) &&
+			        'Lead Time Events Measures'[LeadTimeEvent] = "TMSFullDropOff"
+			    )
+			    ,
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+			
+			```
+		formatString: #,##0
+		displayFolder: Historical Tracking
+		lineageTag: ff75d449-449d-4d83-8486-f14eaf32e3bf
+
+		detailRowsDefinition = ```
+				
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+				        'Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "TMSFullDropOff" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ETA Date", RELATED('ETA Date'[ETA Date]),      
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Events Started Today' = ```
+			// Daily event starts (containers entering a stage)
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    'Lead Time Events Measures'[FromDate] = TODAY(),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)  
+			)
+			
+			
+			
+			
+			```
+		formatString: #,##0
+		displayFolder: Event Count
+		lineageTag: fc706579-a04c-4ada-ab10-3a41facb7b5b
+
+		detailRowsDefinition = ```
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[FromDate] = TODAY() &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    "Company", RELATED('Company'[Company]),
+				    "Event", RELATED('Lead Time Events'[Lead Time Event Desc.]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),    
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Events Completed Today' = ```
+			// Daily event starts (containers entering a stage)
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    'Lead Time Events Measures'[ToDate] = TODAY(),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)  
+			)
+			
+			
+			
+			
+			```
+		formatString: #,##0
+		displayFolder: Event Count
+		lineageTag: e474d4d9-080e-4b58-9f9d-936bbe7c17f9
+
+		detailRowsDefinition = ```
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[ToDate] = TODAY() &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    "Company", RELATED('Company'[Company]),
+				    "Event", RELATED('Lead Time Events'[Lead Time Event Desc.]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),    
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Containers Ready for Transport to Warehouse' =
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    NOT(ISBLANK('Lead Time Events Measures'[FromDate])),
+			    ISBLANK('Lead Time Events Measures'[ToDate]),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    'Lead Time Events Measures'[LeadTimeEvent] = "TMSOrderCreation_TMSFullDropOff"
+			)
+		formatString: #,##0
+		displayFolder: Container Count
+		lineageTag: 49f31b08-53b5-46ac-90cb-0bb22ccea7e9
+
+		detailRowsDefinition =
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				        ISBLANK('Lead Time Events Measures'[ToDate]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "Unloading_EmptyReturn" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+
+	measure 'Avg Lead Time Arrival at Warehouse to Unloading' =
+			CALCULATE(
+			    AVERAGE('Lead Time Events Measures'[LeadTimeCalendarDays]),
+			    'Lead Time Events Measures'[LeadTimeEvent] = "TMSFullDropOff_Unloading",
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+		formatString: #,##0.00
+		displayFolder: Duration
+		lineageTag: 52db92e2-4c82-450c-b498-68edb544bfe5
+
+		detailRowsDefinition = ```
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[LeadTimeEvent] = "TMSFullDropOff_Unloading" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),   
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date]),
+				    "Lead Time (Calendar Days)", 'Lead Time Events Measures'[LeadTimeCalendarDays]
+				)
+				```
+
+	/// Based on TMS Empty Return Date
+	measure 'Containers Returned by Date' = ```
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    FILTER(
+			        'Lead Time Events Measures',
+			        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+			        'Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) &&
+			        'Lead Time Events Measures'[LeadTimeEvent] = "TMSEmptyReturnDate"
+			    )
+			    ,
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+			
+			```
+		formatString: #,##0
+		displayFolder: Historical Tracking
+		lineageTag: dec163ed-c876-4b18-b4cf-517fcb1c1a14
+
+		detailRowsDefinition = ```
+				
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+				        'Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "TMSFullDropOff" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	/// Based on TMS Full Drop Date
+	measure 'Containers Count by Date' =
+			VAR DayTypeSelection =
+			    COALESCE(SELECTEDVALUE('Day Type'[Day Type]), "Calendar Days")  // default
+			RETURN
+			SWITCH(
+			    DayTypeSelection,
+			    "Business Days", [Containers Count by Date (Business Days)],
+			    /* else */     [Containers Count by Date (Calendar Days)]
+			)
+			
+			//VAR SelectedCategory = SELECTEDVALUE('Lead Time Events'[Event Category])
+			//RETURN
+			//SWITCH(
+			//    SelectedCategory,
+			//    "Milestone", [Containers Milestone Count by Date],
+			//    "LeadTime", [Containers LeadTime Count by Date],
+			//    BLANK()
+			//)
+		formatString: #,##0
+		displayFolder: Historical Tracking
+		lineageTag: 9c53b226-58b4-43f1-8426-e3071e9c8298
+
+	measure 'Daily Containers To Empty Return' =
+			
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    NOT(ISBLANK('Lead Time Events Measures'[FromDate])),
+			    ISBLANK('Lead Time Events Measures'[ToDate]),
+			    'Lead Time Events Measures'[LeadTimeEvent] = "ATA_EmptyReturn",
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    'Lead Time Events Measures'[FromDate] = MAX('Date'[Date])
+			)
+		formatString: #,##0
+		isHidden
+		lineageTag: dc82413e-9a26-48b4-827d-cc701cc3117e
+
+	measure 'Average Lead Time by Date' =
+			VAR DayTypeSelection =
+			    COALESCE(SELECTEDVALUE('Day Type'[Day Type]), "Calendar Days")  // default
+			RETURN
+			SWITCH(
+			    DayTypeSelection,
+			    "Business Days", [Average Lead Time by Date (Business Days)],
+			    /* else */     [Average Lead Time by Date (Calendar Days)]
+			)
+		formatString: #,##0.##
+		displayFolder: Historical Tracking
+		lineageTag: 343e5f34-11ce-482d-bea3-9d91362b2178
+
+		detailRowsDefinition = ```
+				
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT ISBLANK ( 'Lead Time Events Measures'[FromDate] )                 -- new condition
+				            &&
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+				        ('Lead Time Events Measures'[ToDate] >= MIN('Date'[Date])  || ISBLANK('Lead Time Events Measures'[ToDate]))  &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				        "Event", RELATED('Lead Time Events'[Lead Time Event Desc.]),       
+				        "Company", RELATED('Company'[Company]),
+				        "Order Creation Date", [OrderCreationDate],
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Order Date", RELATED('Order Date'[Order Date]),        
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ETA Date", RELATED('ETA Date'[ETA Date]),      
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	/// Based on TMS Full Drop Date
+	measure 'Containers to Empty Return by Date' = ```
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    FILTER(
+			        'Lead Time Events Measures',
+			        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+			        ('Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) || ISBLANK('Lead Time Events Measures'[ToDate])) &&
+			        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_EmptyReturn"
+			    )
+			    ,
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+			
+			```
+		formatString: #,##0
+		displayFolder: Historical Tracking
+		lineageTag: 8c5eb534-67f6-40e1-ad5e-638bcb9b390d
+
+		detailRowsDefinition = ```
+				
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+				        'Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_EmptyReturn" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ETA Date", RELATED('ETA Date'[ETA Date]),      
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Total Lead Time' = SUM('Lead Time Events Measures'[LeadTimeCalendarDays])
+		formatString: #,##0
+		isHidden
+		lineageTag: 1a928d35-8694-44c6-8ecd-45724870f6e3
+
+	/// Based on TMS Full Drop Date
+	measure 'Containers to Unload by Date' = ```
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    FILTER(
+			        'Lead Time Events Measures',
+			        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+			        ('Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) || ISBLANK('Lead Time Events Measures'[ToDate])) &&
+			        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_Unloading"
+			    )
+			    ,
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+			
+			```
+		formatString: #,##0
+		displayFolder: Historical Tracking
+		lineageTag: 3040e5ff-687d-40e7-8b56-8bfb8b995749
+
+		detailRowsDefinition = ```
+				
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+				        'Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_Unloading" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ETA Date", RELATED('ETA Date'[ETA Date]),      
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	/// Based on TMS Full Drop Date
+	measure 'Containers to Arrive at at Warehouse by Date' = ```
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    FILTER(
+			        'Lead Time Events Measures',
+			        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+			        ('Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) || ISBLANK('Lead Time Events Measures'[ToDate])) &&
+			        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_TMSFullDropOff"
+			    )
+			    ,
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+			
+			```
+		formatString: #,##0
+		displayFolder: Historical Tracking
+		lineageTag: d240acac-4787-49d8-920c-08fbab8e775b
+
+		detailRowsDefinition = ```
+				
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+				        'Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_TMSFullDropOff" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ETA Date", RELATED('ETA Date'[ETA Date]),      
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	/// Based on TMS Empty Return Date
+	measure 'Containers Ready for Transport to Warehouse by Date' = ```
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    FILTER(
+			        'Lead Time Events Measures',
+			        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+			        ('Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) || ISBLANK('Lead Time Events Measures'[ToDate])) &&
+			        'Lead Time Events Measures'[LeadTimeEvent] = "TMSOrderCreation_TMSFullDropOff"
+			    )
+			    ,
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+			
+			```
+		formatString: #,##0
+		displayFolder: Historical Tracking
+		lineageTag: b603c0e2-fe7b-4000-be49-15eb27f36997
+
+		detailRowsDefinition = ```
+				
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+				        ('Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) || ISBLANK('Lead Time Events Measures'[ToDate])) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "TMSOrderCreation_TMSFullDropOff" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	/// Based on TMS Empty Return Date
+	measure 'Containers Ready for Unloading by Date' = ```
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    FILTER(
+			        'Lead Time Events Measures',
+			        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+			        ('Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) || ISBLANK('Lead Time Events Measures'[ToDate])) &&
+			        'Lead Time Events Measures'[LeadTimeEvent] = "TMSFullDropOff_Unloading"
+			    )
+			    ,
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+			
+			```
+		formatString: #,##0
+		displayFolder: Historical Tracking
+		lineageTag: ccdd8e67-b9f7-4e18-9787-a31bef03ce99
+
+		detailRowsDefinition = ```
+				
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+				        ('Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) || ISBLANK('Lead Time Events Measures'[ToDate])) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "TMSFullDropOff_Unloading" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	/// Based on TMS Empty Return Date
+	measure 'Containers Ready for Empty Return by Date' = ```
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    FILTER(
+			        'Lead Time Events Measures',
+			        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+			        ('Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) || ISBLANK('Lead Time Events Measures'[ToDate])) &&
+			        'Lead Time Events Measures'[LeadTimeEvent] = "Unloading_EmptyReturn"
+			    )
+			    ,
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+			
+			```
+		formatString: #,##0
+		displayFolder: Historical Tracking
+		lineageTag: 674cdd46-b203-4c03-ad28-c5fb08373ac1
+
+		detailRowsDefinition = ```
+				
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+				        ('Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) || ISBLANK('Lead Time Events Measures'[ToDate])) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "Unloading_EmptyReturn" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Containers to Arrive at Warehouse' =
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    NOT(ISBLANK('Lead Time Events Measures'[FromDate])),
+			    ISBLANK('Lead Time Events Measures'[ToDate]),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    'Lead Time Events Measures'[LeadTimeEvent] = "ATA_TMSFullDropOff"
+			)
+		formatString: #,##0
+		displayFolder: Container Count
+		lineageTag: 021163a6-9317-46c6-b807-daf050b415e5
+
+		detailRowsDefinition = ```
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				        ISBLANK('Lead Time Events Measures'[ToDate]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_TMSFullDropOff" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),    
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Containers Estimated to Arrive at Port' =
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    NOT(ISBLANK('Lead Time Events Measures'[FromDate])),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    'Lead Time Events Measures'[LeadTimeEvent] = "ETA"
+			)
+		formatString: #,##0
+		displayFolder: Container Count
+		lineageTag: cd12e246-45ec-4c55-b378-7d6bec52fa4b
+
+		detailRowsDefinition = ```
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ETA" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),    
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Containers Arrived at Port' =
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    NOT(ISBLANK('Lead Time Events Measures'[FromDate])),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    'Lead Time Events Measures'[LeadTimeEvent] = "ATA"
+			)
+		formatString: #,##0
+		displayFolder: Container Count
+		lineageTag: 48a2806d-e2ad-4a1f-b360-b32a6fa4c190
+
+		detailRowsDefinition = ```
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ATA" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),      
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Containers Arrived at Warehouse' =
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    NOT(ISBLANK('Lead Time Events Measures'[FromDate])),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    'Lead Time Events Measures'[LeadTimeEvent] = "TMSFullDropOff"
+			)
+		formatString: #,##0
+		displayFolder: Container Count
+		lineageTag: 9ef7938f-f7fa-43f7-8cf8-ea73775f6a18
+
+		detailRowsDefinition = ```
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "TMSFullDropOff" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),    
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Containers Unloaded' =
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    NOT(ISBLANK('Lead Time Events Measures'[FromDate])),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    'Lead Time Events Measures'[LeadTimeEvent] = "UnloadingDate"
+			)
+		formatString: #,##0
+		displayFolder: Container Count
+		lineageTag: 63a3f95d-54ec-44cd-be1e-8d5a29ddd617
+
+		detailRowsDefinition =
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "UnloadingDate" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+
+	measure 'Avg Lead Time TMS Order Creation to Arrival at Warehouse' =
+			CALCULATE(
+			    AVERAGE('Lead Time Events Measures'[LeadTimeCalendarDays]),
+			    'Lead Time Events Measures'[LeadTimeEvent] = "TMSOrderCreation_TMSFullDropOff",
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+		formatString: #,##0.00
+		displayFolder: Duration
+		lineageTag: 848e2271-6482-440d-8cdf-91a069556489
+
+	measure 'Avg Lead Time ATA to Empty Return' =
+			CALCULATE(
+			    AVERAGE('Lead Time Events Measures'[LeadTimeCalendarDays]),
+			    'Lead Time Events Measures'[LeadTimeEvent] = "ATA_EmptyReturn",
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+		formatString: #,##0.00
+		displayFolder: Duration
+		lineageTag: ce67a04a-4fbb-44a1-838f-693ddebb4f6f
+
+	measure 'Avg Lead Time Unloading to Empty Return' =
+			CALCULATE(
+			    AVERAGE('Lead Time Events Measures'[LeadTimeCalendarDays]),
+			    'Lead Time Events Measures'[LeadTimeEvent] = "Unloading_EmptyReturn",
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+		formatString: #,##0.00
+		displayFolder: Duration
+		lineageTag: 7a325325-4c0b-4960-8cb8-f1f0ca75b311
+
+	/// Based on TMS Full Drop Date
+	measure 'Avg Lead Time ATA to Unloading by Date' =
+			// Historical tracking by completed date (when the container was unloaded)
+			VAR MinDate = MIN('Date'[Date])
+			VAR MaxDate = MAX('Date'[Date])
+			RETURN
+			CALCULATE(
+			    [Avg Lead Time ATA to Unloading],
+			    'Lead Time Events Measures'[ToDate] >= MinDate,
+			    'Lead Time Events Measures'[ToDate] <= MaxDate
+			)
+		displayFolder: Historical Tracking
+		lineageTag: 63189f04-3d89-4efb-b9d7-bf2c9a08db92
+
+		detailRowsDefinition = ```
+				
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+				        ('Lead Time Events Measures'[ToDate] >= MIN('Date'[Date])  || ISBLANK('Lead Time Events Measures'[ToDate]))  &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ETA Date", RELATED('ETA Date'[ETA Date]),      
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Invalid Status Count' = ```
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    'Lead Time Events Measures'[LeadTimeEvent] = "ETA",
+			    OR(
+			        AND(
+			            NOT(ISBLANK('Lead Time Events Measures'[ETADate])), 
+			            AND(
+			                NOT(ISBLANK('Lead Time Events Measures'[ATADate])), 
+			                'Lead Time Events Measures'[ETADate] > 'Lead Time Events Measures'[ATADate]
+			            )
+			        ),
+			        OR(
+			            AND(
+			                NOT(ISBLANK('Lead Time Events Measures'[ATADate])), 
+			                AND(
+			                    NOT(ISBLANK('Lead Time Events Measures'[ReleaseDate])), 
+			                    'Lead Time Events Measures'[ATADate] > 'Lead Time Events Measures'[ReleaseDate]
+			                )
+			            ),
+			            OR(
+			                AND(
+			                    NOT(ISBLANK('Lead Time Events Measures'[ReleaseDate])), 
+			                    AND(
+			                        NOT(ISBLANK('Lead Time Events Measures'[TMSFullDropOffDate])), 
+			                        'Lead Time Events Measures'[ReleaseDate] > 'Lead Time Events Measures'[TMSFullDropOffDate]
+			                    )
+			                ),
+			                OR(
+			                    AND(
+			                        NOT(ISBLANK('Lead Time Events Measures'[TMSFullDropOffDate])), 
+			                        AND(
+			                            NOT(ISBLANK('Lead Time Events Measures'[DateUnloaded])), 
+			                            'Lead Time Events Measures'[TMSFullDropOffDate] > 'Lead Time Events Measures'[DateUnloaded]
+			                        )
+			                    ),
+			                    AND(
+			                        NOT(ISBLANK('Lead Time Events Measures'[DateUnloaded])), 
+			                        AND(
+			                            NOT(ISBLANK('Lead Time Events Measures'[TMSEmptyReturnDate])), 
+			                            'Lead Time Events Measures'[DateUnloaded] > 'Lead Time Events Measures'[TMSEmptyReturnDate]
+			                        )
+			                    )
+			                )
+			            )
+			        )
+			    )
+			)
+			```
+		formatString: #,##0
+		displayFolder: Data Quality
+		lineageTag: 70b1bc16-8b2c-4160-80ae-fee1c73970c0
+
+		detailRowsDefinition = ```
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				        ISBLANK('Lead Time Events Measures'[ToDate]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ETA" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE) &&
+				        
+				        
+				        
+				    OR(
+				        AND(
+				            NOT(ISBLANK('Lead Time Events Measures'[ETADate])), 
+				            AND(
+				                NOT(ISBLANK('Lead Time Events Measures'[ATADate])), 
+				                'Lead Time Events Measures'[ETADate] > 'Lead Time Events Measures'[ATADate]
+				            )
+				        ),
+				        OR(
+				            AND(
+				                NOT(ISBLANK('Lead Time Events Measures'[ATADate])), 
+				                AND(
+				                    NOT(ISBLANK('Lead Time Events Measures'[ReleaseDate])), 
+				                    'Lead Time Events Measures'[ATADate] > 'Lead Time Events Measures'[ReleaseDate]
+				                )
+				            ),
+				            OR(
+				                AND(
+				                    NOT(ISBLANK('Lead Time Events Measures'[ReleaseDate])), 
+				                    AND(
+				                        NOT(ISBLANK('Lead Time Events Measures'[TMSFullDropOffDate])), 
+				                        'Lead Time Events Measures'[ReleaseDate] > 'Lead Time Events Measures'[TMSFullDropOffDate]
+				                    )
+				                ),
+				                OR(
+				                    AND(
+				                        NOT(ISBLANK('Lead Time Events Measures'[TMSFullDropOffDate])), 
+				                        AND(
+				                            NOT(ISBLANK('Lead Time Events Measures'[DateUnloaded])), 
+				                            'Lead Time Events Measures'[TMSFullDropOffDate] > 'Lead Time Events Measures'[DateUnloaded]
+				                        )
+				                    ),
+				                    AND(
+				                        NOT(ISBLANK('Lead Time Events Measures'[DateUnloaded])), 
+				                        AND(
+				                            NOT(ISBLANK('Lead Time Events Measures'[TMSEmptyReturnDate])), 
+				                            'Lead Time Events Measures'[DateUnloaded] > 'Lead Time Events Measures'[TMSEmptyReturnDate]
+				                        )
+				                    )
+				                )
+				            )
+				        )
+				    )       
+				        
+				        
+				        
+				        
+				        
+				        
+				        
+				        
+				        
+				        
+				    ),
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),    
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Unusual Duration Detection' =
+			// Data anomaly detection
+			
+			SWITCH(
+			    TRUE(),
+			    [Avg Lead Time Arrival at Warehouse to Unloading] > 2, "⚠️ Warning: time from Arrival at Warehouse to Unloading too long",
+			    [Avg Lead Time ATA to Empty Return] > 14, "⚠️ Warning: ATA to Empty Return",
+			    [Avg Lead Time ATA to Unloading] > 10, "⚠️ Warning: time from ATA to Unloading too long",
+			    "✓ Normal processing time"
+			)
+		displayFolder: Data Quality
+		lineageTag: ae2adf62-c328-4bce-a583-2a33fdfcba87
+
+	measure 'Containers Within SLA' = ```
+			// Containers discharged within 14 working days
+			
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    FILTER(
+			        'Lead Time Events Measures',
+			        NOT(ISBLANK('Lead Time Events Measures'[ATADate])) &&
+			        NOT(ISBLANK('Lead Time Events Measures'[DateUnloaded])) &&
+			        'Lead Time Events Measures'[Avg Lead Time ATA to Unloading] <= 14 &&
+			        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_Unloading"
+			    )
+			)
+			
+			```
+		formatString: #,##0
+		displayFolder: Customer Specific KPIs
+		lineageTag: 08d0ebe4-2392-489f-a764-fdb3593e740f
+
+		detailRowsDefinition = ```
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				        NOT(ISBLANK('Lead Time Events Measures'[ToDate])) &&
+				        'Lead Time Events Measures'[Avg Lead Time ATA to Unloading] < 14 &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_Unloading" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    
+				 
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),    
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Containers Exceeding SLA' = ```
+			// Containers discharged within 14 working days
+			
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    FILTER(
+			        'Lead Time Events Measures',
+			        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+			        NOT(ISBLANK('Lead Time Events Measures'[ToDate])) &&
+			        'Lead Time Events Measures'[Avg Lead Time ATA to Unloading] > 14 &&
+			        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_Unloading"
+			    )
+			)
+			
+			```
+		formatString: #,##0
+		displayFolder: Customer Specific KPIs
+		lineageTag: 0ee22b96-2f85-4cfb-8f02-af542a70c8d6
+
+		detailRowsDefinition = ```
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				        NOT(ISBLANK('Lead Time Events Measures'[ToDate])) &&
+				        'Lead Time Events Measures'[Avg Lead Time ATA to Unloading] >= 14 &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_Unloading" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    
+				 
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),    
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure '% Within SLA' = ```
+			// Percentage of containers within SLA
+			DIVIDE(
+			    [Containers Within SLA],
+			    [Containers Within SLA] + [Containers Exceeding SLA] + [Containers With Missing Start Date for SLA],
+			    0
+			)
+			
+			
+			```
+		formatString: #,##0.00 %
+		displayFolder: Customer Specific KPIs
+		lineageTag: 01e59f23-b308-4deb-a83c-0bab4067b047
+
+		detailRowsDefinition = ```
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				        NOT(ISBLANK('Lead Time Events Measures'[ToDate])) &&
+				        'Lead Time Events Measures'[Avg Lead Time ATA to Unloading] < 14 &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_Unloading" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    
+				 
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),    
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure '% Exceeding SLA' =
+			// Percentage of containers exceeding SLA
+			
+			DIVIDE(
+			    [Containers Exceeding SLA],
+			   [Containers Within SLA] + [Containers Exceeding SLA] + [Containers With Missing Start Date for SLA],
+			    0
+			)
+		formatString: #,##0.00 %
+		displayFolder: Customer Specific KPIs
+		lineageTag: 3ed00253-0d13-47d9-8627-445ea2e72264
+
+		detailRowsDefinition = ```
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				        NOT(ISBLANK('Lead Time Events Measures'[ToDate])) &&
+				        'Lead Time Events Measures'[Avg Lead Time ATA to Unloading] >= 14 &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_Unloading" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    
+				 
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),    
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Containers With Missing Start Date for SLA' = ```
+			// Containers discharged within 14 working days
+			
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    FILTER(
+			        'Lead Time Events Measures',
+			        ISBLANK('Lead Time Events Measures'[FromDate]) &&
+			        NOT(ISBLANK('Lead Time Events Measures'[ToDate])) &&
+			        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_Unloading"
+			    )
+			)
+			
+			
+			
+			```
+		formatString: #,##0
+		displayFolder: Customer Specific KPIs
+		lineageTag: 2ee45dd0-6590-4433-bfdf-9a5a9da060e6
+
+		detailRowsDefinition = ```
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        ISBLANK('Lead Time Events Measures'[FromDate]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_Unloading" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    
+				 
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),    
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure '% With Missing Start Date for SLA' = ```
+			// Percentage of containers within SLA
+			DIVIDE(
+			    [Containers With Missing Start Date for SLA],
+			   [Containers Within SLA] + [Containers Exceeding SLA] + [Containers With Missing Start Date for SLA],
+			    0
+			)
+			
+			
+			```
+		formatString: #,##0.00 %
+		displayFolder: Customer Specific KPIs
+		lineageTag: 3e05ae8c-ec11-4f27-a245-09fe20d1e6cc
+
+		detailRowsDefinition = ```
+				SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        ISBLANK('Lead Time Events Measures'[FromDate]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_Unloading" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),
+				    
+				 
+				    "Company", RELATED('Company'[Company]),
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),    
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Containers Currently In Stage' = ```
+			VAR DayTypeSelection =
+			    COALESCE(SELECTEDVALUE('Day Type'[Day Type]), "Calendar Days")  // default
+			RETURN
+			SWITCH(
+			    DayTypeSelection,
+			    "Business Days", [Containers Currently In Stage (Business Days)],
+			    /* else */     [Containers Currently In Stage (Calendar Days)]
+			)
+			
+			```
+		formatString: #,##0
+		displayFolder: Container Count
+		lineageTag: c4f6b291-2d57-4d62-8a8e-1d179cf95f4b
+
+		detailRowsDefinition = ```
+				    SELECTCOLUMNS(
+				        FILTER(
+				        'Lead Time Events Measures',
+				        RELATED('Freight Type'[Freight Type]) = "Containers" &&
+				        RELATED('Terminal'[Own Site]) = TRUE &&
+				    NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				    'Lead Time Events Measures'[FromDate] <= TODAY() &&
+				    ISBLANK('Lead Time Events Measures'[ToDate]) ||
+				        'Lead Time Events Measures'[ToDate] > TODAY()      
+				    )  ,  
+				    
+				
+				    "Company", RELATED('Company'[Company]),
+				    "Order Creation Date", [OrderCreationDate],
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				    "Customer Code", RELATED('Customer'[Customer Code]),
+				    "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),       
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "TMS Full Pickup Date",  'Lead Time Events Measures'[TMSFullPickupDate],
+				    "TMS Full Pickup Location", RELATED('TMS Full Pickup Location'[TMS Full Pickup Address Name]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Empty Return Location", RELATED('TMS Empty Return Location'[TMS Empty Return Address Name]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Missing From Date' =
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    ISBLANK('Lead Time Events Measures'[FromDate]),
+			    NOt(ISBLANK('Lead Time Events Measures'[ToDate]))
+			)
+		formatString: #,##0
+		displayFolder: Data Quality
+		lineageTag: 6b245d6e-6b53-402d-bdb3-9531e64af258
+
+		detailRowsDefinition = ```
+				    SELECTCOLUMNS(
+				        FILTER(
+				        'Lead Time Events Measures',
+				         ISBLANK('Lead Time Events Measures'[FromDate]) &&
+				        NOT(ISBLANK('Lead Time Events Measures'[ToDate])) &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)        
+				    )  ,  
+				    
+				
+				    
+				 
+				    
+				    
+				    
+				    
+				    
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				"Customer Code", RELATED('Customer'[Customer Code]),
+				"Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				         "ETA Date", RELATED('ETA Date'[ETA Date]),       
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Avg Lead Time' =
+			VAR DayTypeSelection =
+			    COALESCE(SELECTEDVALUE('Day Type'[Day Type]), "Calendar Days")  // default
+			RETURN
+			SWITCH(
+			    DayTypeSelection,
+			    "Business Days", [Avg Lead Time (Business Days)],
+			    /* else */     [Avg Lead Time (Calendar Days)]
+			)
+		formatString: #,##0.00
+		displayFolder: Duration
+		lineageTag: 0335d718-0c71-4f11-86b8-5b5cf46a0de7
+
+	/// Based on Weight Note Task Date
+	measure 'Containers to Weigh' = ```
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    FILTER(
+			        'Lead Time Events Measures',
+			        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+			        ('Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) || ISBLANK('Lead Time Events Measures'[ToDate])) &&
+			        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_WeightNoteTask"
+			    )
+			    ,
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+			
+			```
+		formatString: #,##0
+		displayFolder: Historical Tracking
+		lineageTag: 7be9a078-e3a1-4260-867f-51170ef6ac98
+
+		detailRowsDefinition = ```
+				
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+				        'Lead Time Events Measures'[ToDate] >= MIN('Date'[Date]) &&
+				        'Lead Time Events Measures'[LeadTimeEvent] = "ATA_WeightNoteTask" &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ETA Date", RELATED('ETA Date'[ETA Date]),      
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date]),
+				        "Weight Note Task Date",'Lead Time Events Measures'[WeightNoteTaskDate]
+				)
+				```
+
+	/// Based on TMS Full Drop Date
+	measure 'Containers Completed by Date' = ```
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),    
+			    FILTER(
+			        'Lead Time Events Measures',
+			        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+			        'Lead Time Events Measures'[ToDate] >= MIN('Date'[Date])
+			    )
+			
+			)
+			
+			```
+		formatString: #,##0
+		displayFolder: Historical Tracking
+		lineageTag: 1d6db3c7-e252-45b5-a2c6-ce60f973f888
+
+		detailRowsDefinition = ```
+				
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+				        ('Lead Time Events Measures'[ToDate] >= MIN('Date'[Date])  || ISBLANK('Lead Time Events Measures'[ToDate]))  &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				        "Event", RELATED('Lead Time Events'[Lead Time Event Desc.]),       
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ETA Date", RELATED('ETA Date'[ETA Date]),      
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Order Count' =
+			CALCULATE(
+			    DISTINCT('Lead Time Events Measures'[SK_LeadTime_Order]),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+		formatString: #,##0
+		displayFolder: Container Count
+		lineageTag: cc7378a8-eaa3-4688-b30a-30a4f5a75cc0
+
+		detailRowsDefinition = ```
+				    SELECTCOLUMNS(
+				        FILTER(
+				        'Lead Time Events Measures',
+				        RELATED('Freight Type'[Freight Type]) = "Containers" &&
+				        RELATED('Terminal'[Own Site]) = TRUE
+				    )  ,  
+				    
+				
+				        "Company", RELATED('Company'[Company]),
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				"Customer Code", RELATED('Customer'[Customer Code]),
+				"Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Order Date", RELATED('Order Date'[Order Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+		changedProperty = IsHidden
+
+	measure 'Total  Lead Time' =
+			VAR DayTypeSelection =
+			    COALESCE(SELECTEDVALUE('Day Type'[Day Type]), "Calendar Days")  // default
+			RETURN
+			SWITCH(
+			    DayTypeSelection,
+			    "Business Days", [Total Lead Time (Business Days)],
+			    /* else */     [Total Lead Time (Calendar Days)]
+			)
+		formatString: #,##0
+		displayFolder: Duration
+		lineageTag: 4ccbd99e-3765-49b5-90a1-142fe53da9ad
+
+	measure 'Avg Lead Time (Business Days)' =
+			CALCULATE(
+			    AVERAGE('Lead Time Events Measures'[LeadTimeBusinessDays]),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    USERELATIONSHIP('Lead Time Days'[SK_LeadTimeDays], 'Lead Time Events Measures'[SK_LeadTime_LeadTimeBusinessDays])
+			)
+		formatString: #,##0.00
+		isHidden
+		displayFolder: Duration
+		lineageTag: 31ecfd0e-ae0a-47ae-94f2-3e2d0245d576
+
+	measure 'Avg Lead Time (Calendar Days)' =
+			CALCULATE(
+			    AVERAGE('Lead Time Events Measures'[LeadTimeCalendarDays]),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+		formatString: #,##0.00
+		isHidden
+		displayFolder: Duration
+		lineageTag: 5faf2077-30b1-4799-b7ba-25c1fafc8a5f
+
+	measure 'Average Lead Time by Date (Calendar Days)' =
+			CALCULATE(
+			    [Avg Lead Time (Calendar Days)],
+			    FILTER (
+			        'Lead Time Events Measures',
+			        NOT ISBLANK ( 'Lead Time Events Measures'[FromDate] )                 -- new condition
+			            && 'Lead Time Events Measures'[FromDate] <= MAX ( 'Date'[Date] )
+			            && (   'Lead Time Events Measures'[ToDate] >= MIN ( 'Date'[Date] )
+			                 || ISBLANK ( 'Lead Time Events Measures'[ToDate] ) )
+			    )
+			
+			)
+		formatString: #,##0.##
+		isHidden
+		displayFolder: Historical Tracking
+		lineageTag: cb4f78de-393a-4273-97ed-21a490b3a56e
+
+		detailRowsDefinition = ```
+				
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT ISBLANK ( 'Lead Time Events Measures'[FromDate] )                 -- new condition
+				            &&
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+				        ('Lead Time Events Measures'[ToDate] >= MIN('Date'[Date])  || ISBLANK('Lead Time Events Measures'[ToDate]))  &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				        "Event", RELATED('Lead Time Events'[Lead Time Event Desc.]),       
+				        "Company", RELATED('Company'[Company]),
+				        "Order Creation Date", [OrderCreationDate],
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Order Date", RELATED('Order Date'[Order Date]),        
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ETA Date", RELATED('ETA Date'[ETA Date]),      
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Average Lead Time by Date (Business Days)' =
+			CALCULATE(
+			    [Avg Lead Time (Business Days)],
+			    FILTER (
+			        'Lead Time Events Measures',
+			        NOT ISBLANK ( 'Lead Time Events Measures'[FromDate] )                 -- new condition
+			            && 'Lead Time Events Measures'[FromDate] <= MAX ( 'Date'[Date] )
+			            && (   'Lead Time Events Measures'[ToDate] >= MIN ( 'Date'[Date] )
+			                 || ISBLANK ( 'Lead Time Events Measures'[ToDate] ) )
+			    )
+			
+			)
+		formatString: #,##0.##
+		isHidden
+		displayFolder: Historical Tracking
+		lineageTag: 82983ce9-f68d-42b4-b1a6-18bab32d0dce
+
+		detailRowsDefinition = ```
+				
+				   SELECTCOLUMNS(
+				    FILTER(
+				        'Lead Time Events Measures',
+				        NOT ISBLANK ( 'Lead Time Events Measures'[FromDate] )                 -- new condition
+				            &&
+				        'Lead Time Events Measures'[FromDate] <= MAX('Date'[Date]) &&
+				        ('Lead Time Events Measures'[ToDate] >= MIN('Date'[Date])  || ISBLANK('Lead Time Events Measures'[ToDate]))  &&
+				        CALCULATE(VALUES('Freight Type'[Freight Type]) = "Containers") &&
+				        CALCULATE(VALUES('Terminal'[Own Site]) = TRUE)
+				    ),  
+				        "Event", RELATED('Lead Time Events'[Lead Time Event Desc.]),       
+				        "Company", RELATED('Company'[Company]),
+				        "Order Creation Date", [OrderCreationDate],
+				        "Order No.", RELATED('Order'[Order No.]),
+				        "Order Date", RELATED('Order Date'[Order Date]),        
+				        "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				        "Customer Code", RELATED('Customer'[Customer Code]),
+				        "Customer Name", RELATED('Customer'[Customer Name]),
+				        "Container No.", RELATED('Container'[Container No.]),
+				        "Freight Type", RELATED('Freight Type'[Freight Type]),
+				        "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				        "ETA Date", RELATED('ETA Date'[ETA Date]),      
+				        "ATA Date", RELATED('ATA Date'[ATA Date]),
+				        "Advise Date", RELATED('Advise Date'[Advise Date]),
+				        "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				        "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				        "Release Date", RELATED('Release Date'[Release Date]),
+				        "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				        "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				        "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				        "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Max Lead Time (Business Days)' =
+			CALCULATE(
+			    MAX('Lead Time Events Measures'[LeadTimeBusinessDays]),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    USERELATIONSHIP('Lead Time Days'[SK_LeadTimeDays], 'Lead Time Events Measures'[SK_LeadTime_LeadTimeBusinessDays])
+			)
+		formatString: #,##0.00
+		isHidden
+		displayFolder: Duration
+		lineageTag: 3880a406-faff-4a41-b926-7e1defa11cba
+
+	measure 'Max Lead Time (Calendar Days)' =
+			CALCULATE(
+			    MAX('Lead Time Events Measures'[LeadTimeCalendarDays]),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+		formatString: #,##0.00
+		isHidden
+		displayFolder: Duration
+		lineageTag: 127c5952-f356-4476-a506-1c19086f8a34
+
+	measure 'Max Lead Time' =
+			VAR DayTypeSelection =
+			    COALESCE(SELECTEDVALUE('Day Type'[Day Type]), "Calendar Days")  // default
+			RETURN
+			SWITCH(
+			    DayTypeSelection,
+			    "Business Days", [Max Lead Time (Business Days)],
+			    /* else */     [Max Lead Time (Calendar Days)]
+			)
+		formatString: #,##0
+		displayFolder: Duration
+		lineageTag: f8c64346-84d8-4349-bee1-206e8118c496
+
+	measure 'Total Lead Time (Business Days)' =
+			CALCULATE(
+			    SUM('Lead Time Events Measures'[LeadTimeBusinessDays]),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    USERELATIONSHIP('Lead Time Days'[SK_LeadTimeDays], 'Lead Time Events Measures'[SK_LeadTime_LeadTimeBusinessDays])
+			)
+		formatString: #,##0.00
+		isHidden
+		displayFolder: Duration
+		lineageTag: 2c16e092-f310-41fd-9dcd-5ff1c463ebc1
+
+	measure 'Total Lead Time (Calendar Days)' =
+			CALCULATE(
+			    SUM('Lead Time Events Measures'[LeadTimeCalendarDays]),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE)
+			)
+		formatString: #,##0.00
+		isHidden
+		displayFolder: Duration
+		lineageTag: cd1eb2c4-75fb-44e1-b597-95b36afa4fab
+
+	measure 'Containers Currently In Stage (Business Days)' = ```
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    NOT(ISBLANK('Lead Time Events Measures'[FromDate])),
+			    'Lead Time Events Measures'[FromDate] <= TODAY(),
+			    ISBLANK('Lead Time Events Measures'[ToDate]) ||
+			        'Lead Time Events Measures'[ToDate] > TODAY(),
+			    USERELATIONSHIP('Lead Time Days'[SK_LeadTimeDays], 'Lead Time Events Measures'[SK_LeadTime_LeadTimeBusinessDays])
+			)
+			
+			```
+		formatString: #,##0
+		isHidden
+		displayFolder: Container Count
+		lineageTag: bee3e553-1061-4420-946d-0e326dbf41b3
+
+		detailRowsDefinition = ```
+				    SELECTCOLUMNS(
+				        FILTER(
+				        'Lead Time Events Measures',
+				        RELATED('Freight Type'[Freight Type]) = "Containers" &&
+				        RELATED('Terminal'[Own Site]) = TRUE &&
+				    NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				    'Lead Time Events Measures'[FromDate] <= TODAY() &&
+				    ISBLANK('Lead Time Events Measures'[ToDate]) ||
+				        'Lead Time Events Measures'[ToDate] > TODAY()      
+				    )  ,  
+				    
+				
+				    "Company", RELATED('Company'[Company]),
+				    "Order Creation Date", [OrderCreationDate],
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				    "Customer Code", RELATED('Customer'[Customer Code]),
+				    "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),       
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "TMS Full Pickup Date",  'Lead Time Events Measures'[TMSFullPickupDate],
+				    "TMS Full Pickup Location", RELATED('TMS Full Pickup Location'[TMS Full Pickup Address Name]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Empty Return Location", RELATED('TMS Empty Return Location'[TMS Empty Return Address Name]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	measure 'Containers Currently In Stage (Calendar Days)' = ```
+			CALCULATE(
+			    COUNTROWS('Lead Time Events Measures'),
+			    KEEPFILTERS('Freight Type'[Freight Type] = "Containers"),
+			    KEEPFILTERS('Terminal'[Own Site] = TRUE),
+			    NOT(ISBLANK('Lead Time Events Measures'[FromDate])),
+			    'Lead Time Events Measures'[FromDate] <= TODAY(),
+			    ISBLANK('Lead Time Events Measures'[ToDate]) ||
+			        'Lead Time Events Measures'[ToDate] > TODAY()
+			)
+			
+			```
+		formatString: #,##0
+		isHidden
+		displayFolder: Container Count
+		lineageTag: 8872beed-cb81-40b4-a849-35820ace1ba6
+
+		detailRowsDefinition = ```
+				    SELECTCOLUMNS(
+				        FILTER(
+				        'Lead Time Events Measures',
+				        RELATED('Freight Type'[Freight Type]) = "Containers" &&
+				        RELATED('Terminal'[Own Site]) = TRUE &&
+				    NOT(ISBLANK('Lead Time Events Measures'[FromDate])) &&
+				    'Lead Time Events Measures'[FromDate] <= TODAY() &&
+				    ISBLANK('Lead Time Events Measures'[ToDate]) ||
+				        'Lead Time Events Measures'[ToDate] > TODAY()      
+				    )  ,  
+				    
+				
+				    "Company", RELATED('Company'[Company]),
+				    "Order Creation Date", [OrderCreationDate],
+				    "Order No.", RELATED('Order'[Order No.]),
+				    "Terminal Code", RELATED('Terminal'[Terminal Code]),
+				    "Customer Code", RELATED('Customer'[Customer Code]),
+				    "Customer Name", RELATED('Customer'[Customer Name]),
+				    "Container No.", RELATED('Container'[Container No.]),
+				    "Freight Type", RELATED('Freight Type'[Freight Type]),
+				    "TMS Order No", RELATED('TMS Order'[TMS Order No.]),
+				    "ETA Date", RELATED('ETA Date'[ETA Date]),       
+				    "ATA Date", RELATED('ATA Date'[ATA Date]),
+				    "Advise Date", RELATED('Advise Date'[Advise Date]),
+				    "Customs Doc Created On Date", RELATED('Customs Doc Created On Date'[Customs Doc Created On Date]),
+				    "TMS Full Pickup Date",  'Lead Time Events Measures'[TMSFullPickupDate],
+				    "TMS Full Pickup Location", RELATED('TMS Full Pickup Location'[TMS Full Pickup Address Name]),
+				    "Date Unloaded", RELATED('Unloading Date'[Unloading Date]),
+				    "Order Date", RELATED('Order Date'[Order Date]),
+				    "Release Date", RELATED('Release Date'[Release Date]),
+				    "Released To Transport Date", RELATED('Released To Transport Date'[Released To Transport Date]),
+				    "TMS Empty Return Date", RELATED('TMS Empty Return Date'[TMS Empty Return Date]),
+				    "TMS Empty Return Location", RELATED('TMS Empty Return Location'[TMS Empty Return Address Name]),
+				    "TMS Full Drop Off Date", RELATED('TMS Full Drop Off Date'[TMS Full Drop Off Date]),
+				    "TMS Order Date", RELATED('TMS Order Date'[TMS Order Date])
+				)
+				```
+
+	/// Based on TMS Full Drop Date
+	measure 'Containers Count by Date (Business Days)' =
+			CALCULATE(
+			    [Containers Count by Date (Calendar Days)],
+			    USERELATIONSHIP('Lead Time Days'[SK_LeadTimeDays], 'Lead Time Events Measures'[SK_LeadTime_LeadTimeBusinessDays])
+			)
+			//VAR SelectedCategory = SELECTEDVALUE('Lead Time Events'[Event Category])
+			//RETURN
+			//SWITCH(
+			//    SelectedCategory,
+			//    "Milestone", [Containers Milestone Count by Date],
+			//    "LeadTime", [Containers LeadTime Count by Date],
+			//    BLANK()
+			//)
+		formatString: #,##0
+		displayFolder: Historical Tracking
+		lineageTag: f90e16e4-9a03-4e15-a9ad-5e829ea228c4
+
+	/// Based on TMS Full Drop Date
+	measure 'Containers Count by Date (Calendar Days)' =
+			VAR dMin = MIN ( 'Date'[Date] )
+			VAR dMax = MAX ( 'Date'[Date] )
+			RETURN
+			CALCULATE (
+			    COUNTROWS ( 'Lead Time Events Measures' ),
+			    // shared slicers
+			    KEEPFILTERS ( 'Freight Type'[Freight Type] = "Containers" ),
+			    KEEPFILTERS ( 'Terminal'[Own Site] = TRUE ),
+			    // both categories in one go
+			    KEEPFILTERS ( 'Lead Time Events'[Event Category] IN { "LeadTime", "Milestone" } ),
+			    // interval overlap + category-specific end boundary
+			    FILTER (
+			        'Lead Time Events Measures',
+			        VAR cat  = RELATED ( 'Lead Time Events'[Event Category] ) // use RELATED if Event Category is in a related table
+			        VAR fromD = 'Lead Time Events Measures'[FromDate]
+			        VAR toD   = COALESCE ( 'Lead Time Events Measures'[ToDate], DATE ( 9999, 12, 31 ) )
+			        RETURN
+			            NOT ISBLANK ( fromD ) &&
+			            fromD <= dMax &&
+			            IF ( cat = "LeadTime", toD > dMin, toD >= dMin )
+			    )
+			)
+			
+			
+			//VAR SelectedCategory = SELECTEDVALUE('Lead Time Events'[Event Category])
+			//RETURN
+			//SWITCH(
+			//    SelectedCategory,
+			//    "Milestone", [Containers Milestone Count by Date],
+			//    "LeadTime", [Containers LeadTime Count by Date],
+			//    BLANK()
+			//)
+		formatString: #,##0
+		displayFolder: Historical Tracking
+		lineageTag: 22558372-b443-4ea7-b9df-bebf7e186391
+
+	column SK_LeadTime
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 47fda09a-fc2b-471d-8f53-df00a76740d3
+		summarizeBy: none
+		sourceColumn: SK_LeadTime
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column FromDate
+		dataType: dateTime
+		isHidden
+		formatString: d/MM/yyyy
+		lineageTag: dbd72dee-a30a-46b9-9fa3-636983369c88
+		summarizeBy: none
+		sourceColumn: FromDate
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column ToDate
+		dataType: dateTime
+		isHidden
+		formatString: d/MM/yyyy
+		lineageTag: 528f0caa-35ca-4187-869c-2216fa528233
+		summarizeBy: none
+		sourceColumn: ToDate
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column LeadTimeStatus
+		dataType: string
+		isHidden
+		lineageTag: 5e116e67-4e27-471b-9844-b6dc6454c65e
+		summarizeBy: none
+		sourceColumn: LeadTimeStatus
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_Company
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 09e6a733-03b6-4364-851f-11a977cab4e4
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_Company
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_Contact
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: f340453e-e261-4d0e-97ab-19122a095c48
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_Contact
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_Container
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 780fe7df-9de2-4304-bc55-07ddcdcc502f
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_Container
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_Department
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 46fe220f-cba3-4bdd-b5be-1d23aa2bbb16
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_Department
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_FreightType
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2575731a-7385-434e-8d7d-66955cf0e5c1
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_FreightType
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_Order
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9d525ff4-ce23-4392-a52c-a154f9421b57
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_Order
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_Terminal
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 4fd3db47-1a16-4574-9922-ecc8a1ca3e48
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_Terminal
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_TMSOrder
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e6d991bb-0890-48df-8ae7-2d9940d0c76e
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_TMSOrder
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_TransportCompany
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: f9d6605d-d175-4f0e-b891-fcc54a0235c3
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_TransportCompany
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_LeadTimeEvents
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: a9c1d1d4-f3c3-4601-9f5d-f08c331a364e
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_LeadTimeEvents
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_FromEvent
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 022d02e5-3f69-4fbf-9ebe-16eb6298bd74
+		summarizeBy: sum
+		sourceColumn: SK_LeadTime_FromEvent
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_ToEvent
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ad83b786-980b-4397-b058-78fb0639e2f0
+		summarizeBy: sum
+		sourceColumn: SK_LeadTime_ToEvent
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_LeadTimeDays
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e4c9d50c-c4e7-499b-90e2-5eb1efe6a43e
+		summarizeBy: sum
+		sourceColumn: SK_LeadTime_LeadTimeDays
+
+		annotation SummarizationSetBy = Automatic
+
+	column TMSOrderDate
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: adc7181b-37f5-46e6-a5ab-7197e65a98e7
+		summarizeBy: none
+		sourceColumn: TMSOrderDate
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ATADate
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: d53bbd40-f3b1-4fc9-bf0d-2c2e9da082d0
+		summarizeBy: none
+		sourceColumn: ATADate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column AdviseDate
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 7cd95625-6099-496c-a096-d044665277b6
+		summarizeBy: none
+		sourceColumn: AdviseDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column CustomsDocCreatedOn
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 3dca8ae5-64c9-4785-a50c-9241bdf9f14c
+		summarizeBy: none
+		sourceColumn: CustomsDocCreatedOn
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column DateUnloaded
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 67f0a000-6c73-44c6-b07e-675b54aeffc0
+		summarizeBy: none
+		sourceColumn: DateUnloaded
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column OrderDate
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 0dd7aec4-be52-42fd-937b-1395cbeb70c9
+		summarizeBy: none
+		sourceColumn: OrderDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ReleaseDate
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: db66fedd-e46a-44d3-a79b-c5213b27dea5
+		summarizeBy: none
+		sourceColumn: ReleaseDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ReleasedToTransport
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 3e6895ae-aa7e-475b-bf52-b6f4ab551e60
+		summarizeBy: none
+		sourceColumn: ReleasedToTransport
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column TMSEmptyReturnDate
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 10624887-2b2d-4714-8eec-1faab4a7fe28
+		summarizeBy: none
+		sourceColumn: TMSEmptyReturnDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column TMSFullDropOffDate
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 561f79fb-acf2-43e6-b072-667dd576f604
+		summarizeBy: none
+		sourceColumn: TMSFullDropOffDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column SK_LeadTime_LeadTimeStatus
+		dataType: int64
+		isHidden
+		formatString: 0
+		encodingHint: value
+		lineageTag: 5d88d625-4ce8-4008-afaf-946782a34c74
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_LeadTimeStatus
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_LeadTimeDueStatus
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0d42bc30-e8c1-4fcc-9aa0-54fd93f06741
+		summarizeBy: sum
+		sourceColumn: SK_LeadTime_LeadTimeDueStatus
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column ReportDate
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: fee17a91-5adc-4231-a817-c5325906a2c6
+		summarizeBy: none
+		sourceColumn: ReportDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column ETADate
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		isAvailableInMdx: false
+		encodingHint: value
+		lineageTag: 986731e4-82e2-433d-b917-880141028f55
+		summarizeBy: none
+		sourceColumn: ETADate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column LeadTimeEvent
+		dataType: string
+		isHidden
+		lineageTag: a51b372f-d1c8-4361-96e3-4f499c546017
+		summarizeBy: none
+		sourceColumn: LeadTimeEvent
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_LeadTimeBucket
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: cc05f50e-3f08-4d0b-a2fe-7cd47300b3e7
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_LeadTimeBucket
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeightNoteTaskDate
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 0d10fc99-46aa-46f1-a319-5645f7aae286
+		summarizeBy: none
+		sourceColumn: WeightNoteTaskDate
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column SK_LeadTime_EventStatus
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: d9d885fe-d559-493f-8dab-70bb706af8b3
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_EventStatus
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_TMSFullPickupLocation
+		dataType: int64
+		isHidden
+		formatString: 0
+		isAvailableInMdx: false
+		encodingHint: value
+		lineageTag: 8e016956-c637-4f60-b370-03a849a362b8
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_TMSFullPickupLocation
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_TMSEmptyReturnLocation
+		dataType: int64
+		isHidden
+		formatString: 0
+		isAvailableInMdx: false
+		encodingHint: value
+		lineageTag: 0ef80c1b-2215-4fb9-848c-42180177027f
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_TMSEmptyReturnLocation
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column TMSFullPickupDate
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: f02ab854-3815-4008-adf2-c6d6c6154880
+		summarizeBy: none
+		sourceColumn: TMSFullPickupDate
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column OrderCreationDate
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 45b345ae-5b4e-4bcf-bf7c-a94fddc1e554
+		summarizeBy: none
+		sourceColumn: OrderCreationDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column LeadTimeCalendarDays
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 5e9a6c79-9bd7-4191-b691-c95a6a5bf036
+		summarizeBy: sum
+		sourceColumn: LeadTimeCalendarDays
+
+		annotation SummarizationSetBy = Automatic
+
+	column LeadTimeBusinessDays
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 76b2dea0-278b-48ee-926c-e9bad33af8d8
+		summarizeBy: sum
+		sourceColumn: LeadTimeBusinessDays
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_TruckRouteReleased
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 51fe34dd-8aa7-442a-8008-aa88cae0ee37
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_TruckRouteReleased
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_LeadTimeBusinessDays
+		dataType: int64
+		isHidden
+		formatString: 0
+		isAvailableInMdx: false
+		encodingHint: value
+		lineageTag: 07a1f752-0b7a-4301-973e-0597ee00d5ff
+		summarizeBy: sum
+		sourceColumn: SK_LeadTime_LeadTimeBusinessDays
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Lead Time Events Measures' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    fact_LeadTime_Events = Source{[Schema="fact",Item="LeadTime_Events"]}[Data]
+				in
+				    fact_LeadTime_Events
+
+	changedProperty = IsHidden
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

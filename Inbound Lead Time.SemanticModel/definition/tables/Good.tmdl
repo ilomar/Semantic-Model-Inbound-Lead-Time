@@ -1,0 +1,114 @@
+table Good
+	lineageTag: bd4974a0-d90e-4ffd-801b-c3fa3c2453a3
+
+	column 'Internal Stock Reference No.'
+		dataType: string
+		lineageTag: 911ac6f2-2686-48a9-ab77-68f753a6f085
+		summarizeBy: none
+		sourceColumn: Internal Stock Reference No.
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quality
+		dataType: string
+		lineageTag: 3cc8768f-f9a1-4231-9345-f61aba4c7bb6
+		summarizeBy: none
+		sourceColumn: Quality
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Commodity Group Code'
+		dataType: string
+		lineageTag: b083f279-56ef-451b-88f4-2492a73ecb07
+		summarizeBy: none
+		sourceColumn: Commodity Group Code
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Purchase Order No.'
+		dataType: string
+		lineageTag: 96f76722-08ad-4900-ba58-6be72b8318b6
+		summarizeBy: none
+		sourceColumn: Purchase Order No.
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Purchase Order Line No.'
+		dataType: int64
+		formatString: 0
+		lineageTag: 438100a0-73fb-4fd0-8a7a-1dc5f8f42811
+		summarizeBy: sum
+		sourceColumn: Purchase Order Line No.
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Batch No.'
+		dataType: string
+		lineageTag: c59bf639-97b1-4243-8a5e-a77b64d58f81
+		summarizeBy: none
+		sourceColumn: Batch No.
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quantity
+		dataType: double
+		lineageTag: 0cd54317-bd2a-4651-bb20-ef26f6ca18f2
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Unit of Measure Code'
+		dataType: string
+		lineageTag: 5186565b-3578-4fa5-9b60-1ea5258c6b2f
+		summarizeBy: none
+		sourceColumn: Unit of Measure Code
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Gross Weight'
+		dataType: double
+		lineageTag: d697505b-d3f5-4032-a120-bc058bfe302c
+		summarizeBy: sum
+		sourceColumn: Gross Weight
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column SK_FACT_LeadTime
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e573a6a9-9313-40d1-9270-55baf819e10b
+		summarizeBy: none
+		sourceColumn: SK_FACT_LeadTime
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Good = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    dim_LeadTime_FreightType = Source{[Schema="bridge",Item="LeadTime_Good"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_FreightType,{{"BatchNo", "Batch No."}, {"CommodityGroupCode", "Commodity Group Code"}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Renamed Columns",{"GoodsLineNo"}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Removed Columns",{{"GrossWeight", "Gross Weight"}}),
+				    #"Removed Columns1" = Table.RemoveColumns(#"Renamed Columns1",{"HasContainerRegistration", "HasGoodsRegistration"}),
+				    #"Renamed Columns2" = Table.RenameColumns(#"Removed Columns1",{{"InternalStockReferenceNo", "InternalStock Reference No."}, {"PurchaseOrderLineNo", "Purchase Order Line No."}, {"PurchaseOrderNo", "Purchase Order No."}}),
+				    #"Removed Columns2" = Table.RemoveColumns(#"Renamed Columns2",{"SourceSystem", "TaskCode", "TerminalCode"}),
+				    #"Renamed Columns3" = Table.RenameColumns(#"Removed Columns2",{{"UnitofMeasureCode", "Unit of Measure Code"}}),
+				    #"Removed Columns3" = Table.RemoveColumns(#"Renamed Columns3",{"ContainerNo", "OrderLineNo", "OrderNo", "SK_LeadTime_Container", "SK_LeadTime_Good", "SK_LeadTime_PurchaseOrder"}),
+				    #"Renamed Columns4" = Table.RenameColumns(#"Removed Columns3",{{"InternalStock Reference No.", "Internal Stock Reference No."}})
+				in
+				    #"Renamed Columns4"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

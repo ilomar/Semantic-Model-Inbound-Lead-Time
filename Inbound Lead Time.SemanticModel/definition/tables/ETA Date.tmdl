@@ -1,0 +1,185 @@
+table 'ETA Date'
+	lineageTag: a8e56cfc-1da9-4eff-b963-ebd5be68baa7
+	dataCategory: Time
+
+	column 'ETA Date'
+		dataType: dateTime
+		isKey
+		formatString: d/mm/yyyy
+		lineageTag: 94092530-83a2-4568-8686-e536b66561f8
+		summarizeBy: none
+		sourceColumn: ETA Date
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+		annotation TabularEditor_MarkAsDateKey = 1
+
+	column 'ETA Year'
+		dataType: int64
+		formatString: 0
+		lineageTag: 639ced7c-b9c7-4642-813c-35ed6b7074b3
+		summarizeBy: none
+		sourceColumn: ETA Year
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ETA Quarter'
+		dataType: string
+		lineageTag: 440c15a3-8e14-4041-9d2c-db3bf5fa027d
+		summarizeBy: none
+		sourceColumn: ETA Quarter
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ETA Month'
+		dataType: int64
+		formatString: 0
+		lineageTag: 5b3b2f09-7705-4fd6-9e5b-445e1ab7bba8
+		summarizeBy: none
+		sourceColumn: ETA Month
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ETA Month Name'
+		dataType: string
+		lineageTag: 0bed47c9-0056-4823-8198-0a5b9bd6ff10
+		summarizeBy: none
+		sourceColumn: ETA Month Name
+		sortByColumn: 'ETA Month'
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ETA Day'
+		dataType: int64
+		formatString: 0
+		lineageTag: 30bf07b4-140f-44c4-bef7-3cfe9443aaf4
+		summarizeBy: none
+		sourceColumn: ETA Day
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ETA Day of Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: b46b270f-fcd4-4be1-82c5-83beb718cfed
+		summarizeBy: none
+		sourceColumn: ETA Day of Week
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ETA of Week Name'
+		dataType: string
+		lineageTag: abc3ae7f-2694-4ffa-91fb-949fc209a2b1
+		summarizeBy: none
+		sourceColumn: ETA of Week Name
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ETA Is Weekend'
+		dataType: string
+		lineageTag: 772a59cf-b704-4390-b032-09579fb4787f
+		summarizeBy: none
+		sourceColumn: ETA Is Weekend
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ETA Year-Month'
+		dataType: string
+		lineageTag: ea8d50f0-4c9f-4870-af25-aab2dc223635
+		summarizeBy: none
+		sourceColumn: ETA Year-Month
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ETA ISO Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: b447c1cf-16fe-44fb-be69-8f7f9fbbdd12
+		summarizeBy: none
+		sourceColumn: ETA ISO Week
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'ETA Date (Y-M-D)'
+		lineageTag: 0957777b-f12a-4b28-92ac-1bdcef534a9a
+
+		level 'ETA Year'
+			lineageTag: 96e48f6b-49b2-4fc9-b2ec-9ad605628e26
+			column: 'ETA Year'
+
+		level 'ETA Month'
+			lineageTag: c68074d4-3c6c-4a6f-bcee-ab3d504a9c75
+			column: 'ETA Month'
+
+		level 'ETA Date'
+			lineageTag: 27d22342-a7d9-4532-8f96-572cf4ddc9b0
+			column: 'ETA Date'
+
+		changedProperty = IsHidden
+
+	partition 'ETA Date' = m
+		mode: import
+		source =
+				let
+				    // Define Start and End Dates
+				    StartDate = #date(2020, 1, 1),
+				    EndDate = #date(2030, 12, 31),
+				
+				    // Generate a List of Dates
+				    DateList = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+				
+				    // Convert List to Table
+				    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}),
+				
+				    // Add Additional Date Columns
+				    AddYear = Table.AddColumn(DateTable, "Year", each Date.Year([Date]), Int64.Type),
+				    AddQuarter = Table.AddColumn(AddYear, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date]))),
+				    AddMonth = Table.AddColumn(AddQuarter, "Month", each Date.Month([Date]), Int64.Type),
+				    AddMonthName = Table.AddColumn(AddMonth, "Month Name", each Date.ToText([Date], "MMMM")),
+				    AddDay = Table.AddColumn(AddMonthName, "Day", each Date.Day([Date]), Int64.Type),
+				    AddDayOfWeek = Table.AddColumn(AddDay, "Day of Week", each Date.DayOfWeek([Date]) + 1, Int64.Type),
+				    AddDayOfWeekName = Table.AddColumn(AddDayOfWeek, "Day of Week Name", each Date.ToText([Date], "dddd")),
+				    AddIsWeekend = Table.AddColumn(AddDayOfWeekName, "Is Weekend", each if Date.DayOfWeek([Date]) >= 5 then "Yes" else "No"),
+				    AddYearMonth = Table.AddColumn(AddIsWeekend, "Year-Month", each Text.From(Date.Year([Date])) & "-" & Text.PadStart(Text.From(Date.Month([Date])), 2, "0")),
+				
+				    // Add ISO Week
+				    AddISOWeek = Table.AddColumn(AddYearMonth, "ISO Week", each Date.WeekOfYear([Date], Day.Monday), Int64.Type),
+				    #"Changed Type" = Table.TransformColumnTypes(AddISOWeek,{{"Date", type date}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Date", "ETA Date"}, {"Year", "ETA Year"}, {"Quarter", "ETA Quarter"}, {"Month", "ETA Month"}, {"Month Name", "ETA Month Name"}, {"Day", "ETA Day"}, {"Day of Week", "ETA Day of Week"}, {"Day of Week Name", "ETA of Week Name"}, {"Is Weekend", "ETA Is Weekend"}, {"Year-Month", "ETA Year-Month"}, {"ISO Week", "ETA ISO Week"}}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Renamed Columns",{{"ETA Date", type date}}),
+				    #"Changed Type with Locale" = Table.TransformColumnTypes(#"Changed Type1", {{"ETA Date", type date}}, "en-BE")
+				in
+				    #"Changed Type with Locale"
+
+	changedProperty = IsHidden
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,55 @@
+table 'Lead Time Bucket'
+	lineageTag: 2fc3c182-b9b7-4340-9537-b433bdfbd9e3
+
+	column SK_LeadTime_LeadTimeBucket
+		dataType: int64
+		isHidden
+		formatString: 0
+		isAvailableInMdx: false
+		encodingHint: value
+		lineageTag: dc2334cf-3319-46d0-83d0-33aab1955d39
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_LeadTimeBucket
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time Bucket'
+		dataType: string
+		lineageTag: 70ef2015-98c6-42a1-a263-63b685310757
+		summarizeBy: none
+		sourceColumn: Lead Time Bucket
+		sortByColumn: LeadTimeBucketSort
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column LeadTimeBucketSort
+		dataType: int64
+		isHidden
+		formatString: 0
+		encodingHint: value
+		lineageTag: 5ba08752-1ee3-4f74-b220-ac6bcf5e872d
+		summarizeBy: none
+		sourceColumn: LeadTimeBucketSort
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Lead Time Bucket' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    fact_LeadTime_Events = Source{[Schema="dim",Item="LeadTime_LeadTimeBucket"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(fact_LeadTime_Events,{{"LeadTimeBucket", "Lead Time Bucket"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

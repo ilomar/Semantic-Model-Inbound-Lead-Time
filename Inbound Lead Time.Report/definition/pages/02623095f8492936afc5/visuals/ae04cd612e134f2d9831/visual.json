@@ -1,0 +1,56 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.2.0/schema.json",
+  "name": "ae04cd612e134f2d9831",
+  "position": {
+    "x": 290.12131715771227,
+    "y": 0,
+    "z": 4000,
+    "height": 149.74003466204505,
+    "width": 219.61871750433275,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Lead Time Events Measures"
+                    }
+                  },
+                  "Property": "Containers Currently In Stage"
+                }
+              },
+              "queryRef": "Lead Time Events Measures.Containers Currently In Stage",
+              "nativeQueryRef": "Containers Currently In Stage"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Lead Time Events Measures"
+                  }
+                },
+                "Property": "Containers Currently In Stage"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,94 @@
+table Order
+	lineageTag: b0d67588-2caa-416c-ba68-89c4d3784d44
+
+	column SK_LeadTime_Order
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: b8b492f7-56a7-4784-aeaa-e50036d01091
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_Order
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order No.'
+		dataType: string
+		lineageTag: 034c82ad-b5ab-404c-a16b-e334f141b3ed
+		summarizeBy: none
+		sourceColumn: Order No.
+
+		annotation SummarizationSetBy = Automatic
+
+	column MBL
+		dataType: string
+		lineageTag: f2573e2e-7b68-46d6-bae0-d6375e8920ec
+		summarizeBy: none
+		sourceColumn: MBL
+
+		annotation SummarizationSetBy = Automatic
+
+	column Comment
+		dataType: string
+		lineageTag: a1b129b2-3c4e-4656-a515-874af80e8c4b
+		summarizeBy: none
+		sourceColumn: Comment
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Url'
+		dataType: string
+		lineageTag: 12745f81-24bf-4200-818f-eb6fd5faa534
+		dataCategory: WebUrl
+		summarizeBy: none
+		sourceColumn: Order Url
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Description'
+		dataType: string
+		lineageTag: a787f551-19ba-49e3-9311-95b8a1332096
+		summarizeBy: none
+		sourceColumn: Order Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Flow Code'
+		dataType: string
+		lineageTag: 32a1209b-d6d9-477d-861c-06f4b8b8567e
+		summarizeBy: none
+		sourceColumn: Order Flow Code
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Flow Description'
+		dataType: string
+		lineageTag: 3c667d05-207e-4aee-bda1-bb2b65706687
+		summarizeBy: none
+		sourceColumn: Order Flow Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Master Transport Task Type'
+		dataType: string
+		lineageTag: b4adbc24-ed2f-478e-95be-1ed947333f38
+		summarizeBy: none
+		sourceColumn: Master Transport Task Type
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Order = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    dim_LeadTime_Order = Source{[Schema="dim",Item="LeadTime_Order"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_Order,{{"OrderNo", "Order No."}, {"OrderUrl", "Order Url"}, {"MasterTransportTaskType", "Master Transport Task Type"}, {"OrderFlowCode", "Order Flow Code"}, {"OrderFlowDescription", "Order Flow Description"}, {"OrderDescription", "Order Description"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

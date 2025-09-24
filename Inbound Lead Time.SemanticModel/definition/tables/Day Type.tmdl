@@ -1,0 +1,37 @@
+table 'Day Type'
+	lineageTag: fa81d155-4bf4-4252-beb0-779d42f4433d
+
+	column SK_LeadTime_DayType
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2011f771-0f55-4ff9-b39a-025ea7714157
+		summarizeBy: sum
+		sourceColumn: SK_LeadTime_DayType
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day Type'
+		dataType: string
+		lineageTag: dfb9738b-d623-47e9-8ce2-bbac533823f1
+		summarizeBy: none
+		sourceColumn: Day Type
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Day Type' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    dim_LeadTime_DayType = Source{[Schema="dim",Item="LeadTime_DayType"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_DayType,{{"DayType", "Day Type"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

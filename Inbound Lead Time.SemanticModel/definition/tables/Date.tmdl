@@ -1,0 +1,291 @@
+table Date
+	lineageTag: ea73a97b-1697-4ca8-bbe6-ebe73a7187b5
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: d/mm/yyyy
+		lineageTag: 5912a3c9-0672-4a0a-8d09-21f66da1de17
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation TabularEditor_MarkAsDateKey = 1
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: dc57c6d0-0134-4ceb-8609-c396f249185a
+		summarizeBy: sum
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: string
+		lineageTag: 13126b39-ad4f-4d46-a1b6-799b8d93d7f4
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: int64
+		formatString: 0
+		lineageTag: d5a72646-f371-470a-ac6c-8ddbcfc910a5
+		summarizeBy: sum
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Name'
+		dataType: string
+		lineageTag: 4fb4c2eb-4eff-483d-b2ff-ce3530ea78ed
+		summarizeBy: none
+		sourceColumn: Month Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Day
+		dataType: int64
+		formatString: 0
+		lineageTag: 518bff5e-0147-42d7-83a0-d7f6ad1a3623
+		summarizeBy: sum
+		sourceColumn: Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day of Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: 766258b7-0de1-46bd-ae8b-31181517cfbf
+		summarizeBy: sum
+		sourceColumn: Day of Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day of Week Name'
+		dataType: string
+		lineageTag: 076fd73c-f9d2-448b-b5bd-5437c5f04134
+		summarizeBy: none
+		sourceColumn: Day of Week Name
+		sortByColumn: 'Day of Week'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Weekend'
+		dataType: string
+		lineageTag: 761fcf59-3ef6-42b2-af45-822c4c69c46f
+		summarizeBy: none
+		sourceColumn: Is Weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year-Month
+		dataType: string
+		lineageTag: a1941104-7a77-4c39-84ab-bf7569bd81d2
+		summarizeBy: none
+		sourceColumn: Year-Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ISO Week'
+		dataType: string
+		displayFolder: ISO Week
+		lineageTag: 8a763876-d711-4790-95cf-f6f2276ae721
+		summarizeBy: none
+		sourceColumn: ISO Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ISO Year'
+		dataType: int64
+		formatString: 0
+		displayFolder: ISO Week
+		lineageTag: 6320213b-b230-4e2d-add0-c71e21a7f63f
+		summarizeBy: sum
+		sourceColumn: ISO Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ISO Week Number'
+		dataType: int64
+		formatString: 0
+		displayFolder: ISO Week
+		lineageTag: ded9aa37-0edd-4102-bd26-1a111f433a5b
+		summarizeBy: sum
+		sourceColumn: ISO Week Number
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ISO Week Index'
+		dataType: int64
+		formatString: 0
+		displayFolder: ISO Week
+		lineageTag: 283ccbda-6b63-4c3f-b208-34270229e433
+		summarizeBy: sum
+		sourceColumn: ISO Week Index
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day of Week Name Short'
+		dataType: string
+		lineageTag: 12a2d083-deb9-48fb-9545-195db0701dbd
+		summarizeBy: none
+		sourceColumn: Day of Week Name Short
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day Sorted'
+		dataType: dateTime
+		formatString: dd
+		lineageTag: c37b7c63-5c8c-4c91-b094-8e9fe362bd47
+		summarizeBy: none
+		sourceColumn: Day Sorted
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Date Index'
+		dataType: int64
+		formatString: 0
+		lineageTag: 008b79d8-a985-4af0-ae56-68d67d6dbcbc
+		summarizeBy: sum
+		sourceColumn: Date Index
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Date (Y-M-D)'
+		lineageTag: bdfc881e-7398-47d6-9596-1637237cc4d3
+
+		level Year
+			lineageTag: cd959f9d-a27d-4afb-8b7e-41953b8c49f5
+			column: Year
+
+		level Year-Month
+			lineageTag: 5cbd3b63-3d7e-476f-b2f3-30f4100c08fe
+			column: Year-Month
+
+		level Date
+			lineageTag: d8f00508-4d99-4118-bd22-3aaa72851dfa
+			column: Date
+
+	hierarchy 'Date (Y-W-D)'
+		displayFolder: ISO Week
+		lineageTag: bde7e487-b7ce-4961-b69c-5bf49e329954
+
+		level 'ISO Year'
+			lineageTag: 3205b114-b6a4-4e90-9b21-c77ecdbd0a22
+			column: 'ISO Year'
+
+		level 'ISO Week'
+			lineageTag: 3e44177a-182b-40da-bc73-5163163f77ed
+			column: 'ISO Week'
+
+		level Date
+			lineageTag: 22a308ca-c53f-4a04-99d2-88fcaf852210
+			column: Date
+
+	partition Date = m
+		mode: import
+		source = ```
+				let
+				    // Define Start Date
+				    StartDate = #date(2024, 1, 1),
+				
+				    // Dynamically calculate the last day of next year
+				    CurrentYear = Date.Year(DateTime.FixedLocalNow()),
+				    EndDate = #date(CurrentYear + 1, 12, 31),
+				
+				    // Generate a List of Dates
+				    DateList = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+				
+				    // Convert List to Table
+				    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}),
+				
+				    // Add Basic Date Info
+				    AddYear = Table.AddColumn(DateTable, "Year", each Date.Year([Date]), Int64.Type),
+				    AddQuarter = Table.AddColumn(AddYear, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date]))),
+				    AddMonth = Table.AddColumn(AddQuarter, "Month", each Date.Month([Date]), Int64.Type),
+				    AddMonthName = Table.AddColumn(AddMonth, "Month Name", each Date.ToText([Date], "MMMM", "en-US")),
+				    AddDay = Table.AddColumn(AddMonthName, "Day", each Date.Day([Date]), Int64.Type),
+				    AddDayOfWeek = Table.AddColumn(AddDay, "Day of Week", each Date.DayOfWeek([Date]) + 1, Int64.Type),
+				    AddDayOfWeekName = Table.AddColumn(AddDayOfWeek, "Day of Week Name", each Date.ToText([Date], "dddd", "en-US")),
+				    AddDayOfWeekNameShort = Table.AddColumn(AddDayOfWeekName, "Day of Week Name Short", each Text.Start([Day of Week Name], 3)),
+				    AddIsWeekend = Table.AddColumn(AddDayOfWeekNameShort, "Is Weekend", each if Date.DayOfWeek([Date]) >= 5 then "Yes" else "No"),
+				    AddYearMonth = Table.AddColumn(AddIsWeekend, "Year-Month", each Text.From(Date.Year([Date])) & "-" & Text.PadStart(Text.From(Date.Month([Date])), 2, "0")),
+				
+				    // Add ISO Year
+				    AddISOYear = Table.AddColumn(AddYearMonth, "ISO Year", each 
+				        let
+				            d = [Date],
+				            dayOfWeek = Date.DayOfWeek(d, Day.Monday),
+				            nearestThursday = Date.AddDays(d, 3 - dayOfWeek)
+				        in
+				            Date.Year(nearestThursday), Int64.Type),
+				
+				    // Add ISO Week Number
+				    AddISOWeekNumber = Table.AddColumn(AddISOYear, "ISO Week Number", each 
+				        let
+				            d = [Date],
+				            dayOfWeek = Date.DayOfWeek(d, Day.Monday),
+				            nearestThursday = Date.AddDays(d, 3 - dayOfWeek)
+				        in
+				            Date.WeekOfYear(nearestThursday, Day.Monday), Int64.Type),
+				
+				    // Add ISO Week formatted with week start/end
+				    AddISOWeek = Table.AddColumn(AddISOWeekNumber, "ISO Week", each 
+				        let
+				            d = [Date],
+				            dayOfWeek = Date.DayOfWeek(d, Day.Monday),
+				            nearestThursday = Date.AddDays(d, 3 - dayOfWeek),
+				            isoYear = Date.Year(nearestThursday),
+				            isoWeekNumber = Date.WeekOfYear(nearestThursday, Day.Monday),
+				            WeekStartDate = Date.StartOfWeek(d, Day.Monday),
+				            WeekEndDate = Date.AddDays(WeekStartDate, 6)
+				        in
+				            Text.From(isoYear) & "-W" & Text.PadStart(Text.From(isoWeekNumber), 2, "0") 
+				            & " (" & Date.ToText(WeekStartDate, "dd/MM/yyyy") 
+				            & " - " & Date.ToText(WeekEndDate, "dd/MM/yyyy") & ")"
+				    ),
+				
+				    // Add ISO Week Index (today's ISO week = 0)
+				    Today = Date.From(DateTime.FixedLocalNow()),
+				    TodayDow = Date.DayOfWeek(Today, Day.Monday),
+				    TodayNearestThursday = Date.AddDays(Today, 3 - TodayDow),
+				    CurrentISOYear = Date.Year(TodayNearestThursday),
+				    CurrentISOWeek = Date.WeekOfYear(TodayNearestThursday, Day.Monday),
+				    AddISOWeekIndex = Table.AddColumn(AddISOWeek, "ISO Week Index", each 
+				        let
+				            d = [Date],
+				            dow = Date.DayOfWeek(d, Day.Monday),
+				            nearestThursday = Date.AddDays(d, 3 - dow),
+				            isoYear = Date.Year(nearestThursday),
+				            isoWeek = Date.WeekOfYear(nearestThursday, Day.Monday)
+				        in
+				            (isoYear - CurrentISOYear) * 52 + (isoWeek - CurrentISOWeek), Int64.Type),
+				
+				    // Add Relative Date Index (today = 0, yesterday = -1, tomorrow = +1)
+				    AddRelativeDateIndex = Table.AddColumn(AddISOWeekIndex, "Relative Date Index", each 
+				        Duration.Days([Date] - Today), 
+				        Int64.Type
+				    ),
+				
+				    // Ensure types
+				    #"Changed Type" = Table.TransformColumnTypes(AddRelativeDateIndex, {{"Date", type date}}),
+				    #"Duplicated Column" = Table.DuplicateColumn(#"Changed Type", "Date", "Date - Copy"),
+				    #"Renamed Columns" = Table.RenameColumns(#"Duplicated Column",{{"Date - Copy", "Day Sorted"}, {"Relative Date Index", "Date Index"}})
+				
+				in
+				    #"Renamed Columns"
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

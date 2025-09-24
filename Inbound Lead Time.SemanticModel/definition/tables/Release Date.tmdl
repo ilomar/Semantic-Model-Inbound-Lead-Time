@@ -1,0 +1,157 @@
+table 'Release Date'
+	isHidden
+	lineageTag: 25dc7743-d266-4bce-b48e-ba866590858f
+	dataCategory: Time
+
+	column 'Release Date'
+		dataType: dateTime
+		isKey
+		formatString: Short Date
+		lineageTag: 48213722-7f1f-4639-a42e-3f4e76ba1818
+		summarizeBy: none
+		sourceColumn: Release Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation TabularEditor_MarkAsDateKey = 1
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Release Year'
+		dataType: int64
+		formatString: 0
+		lineageTag: a75db6f0-9d12-475b-8d9b-dd362a0e2fb9
+		summarizeBy: none
+		sourceColumn: Release Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Release Quarter'
+		dataType: string
+		lineageTag: e5950029-d954-4aa9-8b8b-064a76986a34
+		summarizeBy: none
+		sourceColumn: Release Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Release Month'
+		dataType: int64
+		formatString: 0
+		lineageTag: 79c3ef3d-b45d-4e5f-ae53-51fd332c7ce8
+		summarizeBy: none
+		sourceColumn: Release Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Release Month Name'
+		dataType: string
+		lineageTag: 806ecd77-6dc8-4990-b063-27356074e0f0
+		summarizeBy: none
+		sourceColumn: Release Month Name
+		sortByColumn: 'Release Month'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Release Day'
+		dataType: int64
+		formatString: 0
+		lineageTag: 019edc30-14c7-4cce-bd64-f881988f64b3
+		summarizeBy: none
+		sourceColumn: Release Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Release Day of Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: 41f87695-1ee0-443b-b1b0-f7aefae5efb1
+		summarizeBy: none
+		sourceColumn: Release Day of Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Release Day of Week Name'
+		dataType: string
+		lineageTag: ec6162e0-9a46-4814-8297-deb673281c0e
+		summarizeBy: none
+		sourceColumn: Release Day of Week Name
+		sortByColumn: 'Release Day of Week'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Release Is Weekend'
+		dataType: string
+		lineageTag: a9cc7ba9-6c80-486e-b1d8-d212d655c36c
+		summarizeBy: none
+		sourceColumn: Release Is Weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Release Year-Month'
+		dataType: string
+		lineageTag: 977fdbc5-8a84-4209-be07-ccd3a8a1e8ec
+		summarizeBy: none
+		sourceColumn: Release Year-Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Release ISO Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: 33dc6d11-09ec-40c6-aaa5-8d705536ad89
+		summarizeBy: none
+		sourceColumn: Release ISO Week
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Release Date (Y-M-D)'
+		lineageTag: eca3a89b-1d03-4bf9-84f9-3442094a3cfb
+
+		level 'Release Year'
+			lineageTag: 6df122b1-4835-42fb-8899-d4424952cf95
+			column: 'Release Year'
+
+		level 'Release Month'
+			lineageTag: 063d2706-f840-4308-b803-48eaef86e9e6
+			column: 'Release Month'
+
+		level 'Release Date'
+			lineageTag: e7105ee8-d4d5-4773-95ad-9fc07bb920ae
+			column: 'Release Date'
+
+	partition 'Release Date' = m
+		mode: import
+		source =
+				let
+				    // Define Start and End Dates
+				    StartDate = #date(2020, 1, 1),
+				    EndDate = #date(2030, 12, 31),
+				
+				    // Generate a List of Dates
+				    DateList = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+				
+				    // Convert List to Table
+				    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}),
+				
+				    // Add Additional Date Columns
+				    AddYear = Table.AddColumn(DateTable, "Year", each Date.Year([Date]), Int64.Type),
+				    AddQuarter = Table.AddColumn(AddYear, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date]))),
+				    AddMonth = Table.AddColumn(AddQuarter, "Month", each Date.Month([Date]), Int64.Type),
+				    AddMonthName = Table.AddColumn(AddMonth, "Month Name", each Date.ToText([Date], "MMMM")),
+				    AddDay = Table.AddColumn(AddMonthName, "Day", each Date.Day([Date]), Int64.Type),
+				    AddDayOfWeek = Table.AddColumn(AddDay, "Day of Week", each Date.DayOfWeek([Date]) + 1, Int64.Type),
+				    AddDayOfWeekName = Table.AddColumn(AddDayOfWeek, "Day of Week Name", each Date.ToText([Date], "dddd")),
+				    AddIsWeekend = Table.AddColumn(AddDayOfWeekName, "Is Weekend", each if Date.DayOfWeek([Date]) >= 5 then "Yes" else "No"),
+				    AddYearMonth = Table.AddColumn(AddIsWeekend, "Year-Month", each Text.From(Date.Year([Date])) & "-" & Text.PadStart(Text.From(Date.Month([Date])), 2, "0")),
+				
+				    // Add ISO Week
+				    AddISOWeek = Table.AddColumn(AddYearMonth, "ISO Week", each Date.WeekOfYear([Date], Day.Monday), Int64.Type),
+				    #"Changed Type" = Table.TransformColumnTypes(AddISOWeek,{{"Date", type date}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Date", "Release Date"}, {"Year", "Release Year"}, {"Quarter", "Release Quarter"}, {"Month", "Release Month"}, {"Month Name", "Release Month Name"}, {"Day", "Release Day"}, {"Day of Week", "Release Day of Week"}, {"Day of Week Name", "Release Day of Week Name"}, {"Is Weekend", "Release Is Weekend"}, {"Year-Month", "Release Year-Month"}, {"ISO Week", "Release ISO Week"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

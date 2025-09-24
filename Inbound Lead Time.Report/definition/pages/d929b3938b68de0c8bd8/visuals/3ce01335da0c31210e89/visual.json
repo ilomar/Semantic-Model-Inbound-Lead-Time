@@ -1,0 +1,49 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.2.0/schema.json",
+  "name": "3ce01335da0c31210e89",
+  "position": {
+    "x": 276.3951473136915,
+    "y": 57.400346620450605,
+    "z": 6000,
+    "height": 61.767764298093581,
+    "width": 984.54072790294617,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Report shows how long is took (for Completed) or is taking (for In Progress) a container to get from one point to another (eg. from [ATA Date] to [Unloading Date]). The value is in calendar days. ",
+                    "textStyle": {
+                      "fontSize": "8pt"
+                    }
+                  },
+                  {
+                    "value": "Remark: ",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "fontSize": "8pt"
+                    }
+                  },
+                  {
+                    "value": "A value of -1 for distribution means that the To Date comes before the From Date and indicated a data quality issue. For instance in the case of [ATA Date] to [Unloading Date] it means that the [Unloading Date] comes before the [ATA Date].",
+                    "textStyle": {
+                      "fontSize": "8pt"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

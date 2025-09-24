@@ -1,0 +1,90 @@
+table 'Lead Time Events'
+	lineageTag: 7658fc6f-ad68-44ce-b932-f053a05f491d
+
+	column SK_LeadTime_LeadTimeEvents
+		dataType: int64
+		isHidden
+		formatString: 0
+		isAvailableInMdx: false
+		encodingHint: value
+		lineageTag: 2d93c9f6-92ee-4f3c-87c9-96d22fc08b3a
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_LeadTimeEvents
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'From Event'
+		dataType: string
+		lineageTag: 801fc054-0cbb-43d3-bd95-57e79f9c766c
+		summarizeBy: none
+		sourceColumn: From Event
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'To Event'
+		dataType: string
+		lineageTag: dc9276ba-58d6-4b17-80f1-dd52617b39fb
+		summarizeBy: none
+		sourceColumn: To Event
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time Event'
+		dataType: string
+		lineageTag: 4fe21fba-8bd1-4e5f-9aaf-980263f1b752
+		summarizeBy: none
+		sourceColumn: Lead Time Event
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time Event Desc.'
+		dataType: string
+		lineageTag: f6de35a6-90a9-45bf-a950-42226b28e9d5
+		summarizeBy: none
+		sourceColumn: Lead Time Event Desc.
+		sortByColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortOrder
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: bdac8460-d73c-4485-ad0b-e49195cf8a07
+		summarizeBy: none
+		sourceColumn: SortOrder
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Event Status'
+		dataType: string
+		lineageTag: 4d9b4afe-4bc9-4f79-91ba-6381f6daf931
+		summarizeBy: none
+		sourceColumn: Event Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Event Category'
+		dataType: string
+		lineageTag: a40fb68e-129f-4a31-a8fc-dc089404ad6e
+		summarizeBy: none
+		sourceColumn: EventCategory
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Lead Time Events' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    dim_LeadTime_LeadTimeEvents = Source{[Schema="dim",Item="LeadTime_LeadTimeEvents"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_LeadTimeEvents,{{"FromEvent", "From Event"}, {"ToEvent", "To Event"}, {"LeadTimeEvent", "Lead Time Event"}, {"LeadTimeDesc", "Lead Time Event Desc."}, {"EventStatus", "Event Status"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

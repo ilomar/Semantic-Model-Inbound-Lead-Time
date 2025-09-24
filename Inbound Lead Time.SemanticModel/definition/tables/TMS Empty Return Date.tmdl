@@ -1,0 +1,156 @@
+table 'TMS Empty Return Date'
+	lineageTag: 109e76cb-ac42-44dd-a636-2f54264f62ff
+	dataCategory: Time
+
+	column 'TMS Empty Return Date'
+		dataType: dateTime
+		isKey
+		formatString: d/mm/yyyy
+		lineageTag: e483b2cc-4145-4029-9d8c-833644bdb2ae
+		summarizeBy: none
+		sourceColumn: TMS Empty Return Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation TabularEditor_MarkAsDateKey = 1
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'TMS Empty Return Year'
+		dataType: int64
+		formatString: 0
+		lineageTag: 6c110b34-5a94-4fd5-bf4d-d239bf24b8e3
+		summarizeBy: none
+		sourceColumn: TMS Empty Return Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Empty Return Quarter'
+		dataType: string
+		lineageTag: 41db0ccc-b0dc-40f5-8c00-565855fa9a3b
+		summarizeBy: none
+		sourceColumn: TMS Empty Return Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Empty Return Month'
+		dataType: int64
+		formatString: 0
+		lineageTag: 405d1edb-0725-4d79-8982-3dd0d294ddfd
+		summarizeBy: none
+		sourceColumn: TMS Empty Return Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Empty Return Month Name'
+		dataType: string
+		lineageTag: 360f1971-f053-4848-8a12-a3499273fe58
+		summarizeBy: none
+		sourceColumn: TMS Empty Return Month Name
+		sortByColumn: 'TMS Empty Return Month'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Empty Return Day'
+		dataType: int64
+		formatString: 0
+		lineageTag: 9c78e65e-684c-439f-a33c-98f3220002d0
+		summarizeBy: none
+		sourceColumn: TMS Empty Return Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Empty Return Day of Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: 178ec9bc-2cea-4cd4-8052-2bc26c9612b6
+		summarizeBy: none
+		sourceColumn: TMS Empty Return Day of Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Empty Return Day of Week Name'
+		dataType: string
+		lineageTag: c03c147a-2cf8-4a94-a50f-f65218994774
+		summarizeBy: none
+		sourceColumn: TMS Empty Return Day of Week Name
+		sortByColumn: 'TMS Empty Return Day of Week'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Empty Return Is Weekend'
+		dataType: string
+		lineageTag: f906ed96-63a0-4d11-9c04-6562822bd72d
+		summarizeBy: none
+		sourceColumn: TMS Empty Return Is Weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Empty Return Year-Month'
+		dataType: string
+		lineageTag: 79d993eb-90a3-4bb3-8d9e-f5356664607f
+		summarizeBy: none
+		sourceColumn: TMS Empty Return Year-Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Empty Return ISO Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: af7ef429-2d14-44a5-8c2f-801c8c2cc34b
+		summarizeBy: none
+		sourceColumn: TMS Empty Return ISO Week
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'TMS Empty Return Date (Y-M-D)'
+		lineageTag: 0e1fd8ba-62d0-4fe8-acb5-d322f51a231f
+
+		level 'TMS Empty Return Year'
+			lineageTag: 0ed73eb0-09a5-4ff0-bfa7-263b1eb9e626
+			column: 'TMS Empty Return Year'
+
+		level 'TMS Empty Return Month'
+			lineageTag: 248389e9-ab5f-4796-b0aa-f7d9d5801b48
+			column: 'TMS Empty Return Month'
+
+		level 'TMS Empty Return Date'
+			lineageTag: 5f0bed4d-28ad-4283-864d-690ee35b9e56
+			column: 'TMS Empty Return Date'
+
+	partition 'TMS Empty Return Date' = m
+		mode: import
+		source =
+				let
+				    // Define Start and End Dates
+				    StartDate = #date(2020, 1, 1),
+				    EndDate = #date(2030, 12, 31),
+				
+				    // Generate a List of Dates
+				    DateList = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+				
+				    // Convert List to Table
+				    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}),
+				
+				    // Add Additional Date Columns
+				    AddYear = Table.AddColumn(DateTable, "Year", each Date.Year([Date]), Int64.Type),
+				    AddQuarter = Table.AddColumn(AddYear, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date]))),
+				    AddMonth = Table.AddColumn(AddQuarter, "Month", each Date.Month([Date]), Int64.Type),
+				    AddMonthName = Table.AddColumn(AddMonth, "Month Name", each Date.ToText([Date], "MMMM")),
+				    AddDay = Table.AddColumn(AddMonthName, "Day", each Date.Day([Date]), Int64.Type),
+				    AddDayOfWeek = Table.AddColumn(AddDay, "Day of Week", each Date.DayOfWeek([Date]) + 1, Int64.Type),
+				    AddDayOfWeekName = Table.AddColumn(AddDayOfWeek, "Day of Week Name", each Date.ToText([Date], "dddd")),
+				    AddIsWeekend = Table.AddColumn(AddDayOfWeekName, "Is Weekend", each if Date.DayOfWeek([Date]) >= 5 then "Yes" else "No"),
+				    AddYearMonth = Table.AddColumn(AddIsWeekend, "Year-Month", each Text.From(Date.Year([Date])) & "-" & Text.PadStart(Text.From(Date.Month([Date])), 2, "0")),
+				
+				    // Add ISO Week
+				    AddISOWeek = Table.AddColumn(AddYearMonth, "ISO Week", each Date.WeekOfYear([Date], Day.Monday), Int64.Type),
+				    #"Changed Type" = Table.TransformColumnTypes(AddISOWeek,{{"Date", type date}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Date", "TMS Empty Return Date"}, {"Year", "TMS Empty Return Year"}, {"Quarter", "TMS Empty Return Quarter"}, {"Month", "TMS Empty Return Month"}, {"Month Name", "TMS Empty Return Month Name"}, {"Day", "TMS Empty Return Day"}, {"Day of Week", "TMS Empty Return Day of Week"}, {"Day of Week Name", "TMS Empty Return Day of Week Name"}, {"Is Weekend", "TMS Empty Return Is Weekend"}, {"Year-Month", "TMS Empty Return Year-Month"}, {"ISO Week", "TMS Empty Return ISO Week"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

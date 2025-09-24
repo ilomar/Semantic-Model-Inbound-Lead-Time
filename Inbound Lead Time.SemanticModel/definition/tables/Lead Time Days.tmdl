@@ -1,0 +1,70 @@
+table 'Lead Time Days'
+	lineageTag: 2afa1ef3-b36d-4d12-86f4-c01ceb473bf9
+
+	column SK_LeadTimeDays
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 3d7a98aa-d661-434f-8337-d48111484ba6
+		summarizeBy: none
+		sourceColumn: SK_LeadTimeDays
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = User
+
+	column 'Lead Time Days'
+		dataType: string
+		lineageTag: 7417613d-6e7f-4dda-ae16-a4f0bb012c27
+		summarizeBy: none
+		sourceColumn: Lead Time Days
+		sortByColumn: SK_LeadTimeDays
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time Days No.'
+		dataType: int64
+		formatString: 0
+		lineageTag: 6f3dc5d0-4ef7-43f6-888f-d20298d23f53
+		summarizeBy: sum
+		sourceColumn: Lead Time Days No.
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unloading Status'
+		dataType: string
+		lineageTag: 36049fb0-0f22-4e1d-b80e-27eed1d4be63
+		summarizeBy: none
+		sourceColumn: Unloading Status
+		sortByColumn: UnloadingStatusSort
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column UnloadingStatusSort
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: bf0856f1-4e7c-4738-b2cc-3d4eafbab9a0
+		summarizeBy: sum
+		sourceColumn: UnloadingStatusSort
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Lead Time Days' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    dim_LeadTime_LeadTimeDays = Source{[Schema="dim",Item="LeadTime_LeadTimeDays"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_LeadTimeDays,{{"LeadTimeDays", "Lead Time Days"}, {"LeadTimeDaysNo", "Lead Time Days No."}, {"UnloadingStatus", "Unloading Status"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

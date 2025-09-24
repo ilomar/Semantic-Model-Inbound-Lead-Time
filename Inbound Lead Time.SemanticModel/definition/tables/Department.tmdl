@@ -1,0 +1,45 @@
+table Department
+	lineageTag: 8003b011-5676-4fd1-8ba8-b97450fad2ec
+
+	column SK_LeadTime_Department
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: b0bf17fc-68f1-45c5-80c7-04ba79623560
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_Department
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Department Code'
+		dataType: string
+		lineageTag: 81609f1e-f6a1-458b-aa27-10988f6b39c4
+		summarizeBy: none
+		sourceColumn: Department Code
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Subdepartment Code'
+		dataType: string
+		lineageTag: cdb67e3d-c479-437d-972c-7c01731db88a
+		summarizeBy: none
+		sourceColumn: Subdepartment Code
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Department = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    dim_LeadTime_Department = Source{[Schema="dim",Item="LeadTime_Department"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_Department,{{"DepartmentCode", "Department Code"}, {"SubdepartmentCode", "Subdepartment Code"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

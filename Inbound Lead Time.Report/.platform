@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Inbound Lead Time"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "cb2d9d85-049c-474f-95b4-ea2d539782fb"
+  }
+}

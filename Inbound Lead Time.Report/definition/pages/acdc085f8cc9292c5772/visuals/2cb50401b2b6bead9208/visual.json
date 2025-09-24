@@ -1,0 +1,33 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.2.0/schema.json",
+  "name": "2cb50401b2b6bead9208",
+  "position": {
+    "x": 35.703021740121237,
+    "y": 65.105510231985775,
+    "z": 0,
+    "height": 51.798433982042752,
+    "width": 599.94307643225011,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "This KPI measures the number of calendar days between a container's ATA date (start date) and its unloading date (end date). A value below 14 days indicates compliance with the SLA."
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

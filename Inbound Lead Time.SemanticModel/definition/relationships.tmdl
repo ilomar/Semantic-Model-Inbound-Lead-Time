@@ -1,0 +1,134 @@
+relationship AutoDetected_7875c2fe-d540-4eaa-9f65-8683125c66c9
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_Company
+	toColumn: Company.SK_LeadTime_Company
+
+relationship AutoDetected_84c31d6a-f990-4070-a593-c2f656fc2a19
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_Container
+	toColumn: Container.SK_LeadTime_Container
+
+relationship AutoDetected_5e9e7300-28ba-4c54-8923-b03b18c81f2f
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_Department
+	toColumn: Department.SK_LeadTime_Department
+
+relationship AutoDetected_6f21a785-b907-4262-a6a7-5eac91c6f012
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_FreightType
+	toColumn: 'Freight Type'.SK_LeadTime_FreightType
+
+relationship AutoDetected_758cc6a3-de22-4f5c-8296-21d75cafe1a4
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_Order
+	toColumn: Order.SK_LeadTime_Order
+
+relationship AutoDetected_4338e268-1963-4ab0-a71d-c8c3dd3707c1
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_Terminal
+	toColumn: Terminal.SK_LeadTime_Terminal
+
+relationship AutoDetected_2540917a-129c-4890-b4a6-ad4f9c71e9ae
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_TMSOrder
+	toColumn: 'TMS Order'.SK_LeadTime_TMSOrder
+
+relationship AutoDetected_d683e0f9-10b2-41a8-bafa-ba08772f1939
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_TransportCompany
+	toColumn: 'Transport Company'.SK_LeadTime_TransportCompany
+
+relationship AutoDetected_a82f7da7-ca8c-4260-91bf-0beb1870b25b
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_LeadTimeEvents
+	toColumn: 'Lead Time Events'.SK_LeadTime_LeadTimeEvents
+
+relationship d7fbfc19-40f0-4a9d-a9d9-97b10277d925
+	fromColumn: 'Lead Time Events Measures'.TMSOrderDate
+	toColumn: 'TMS Order Date'.'TMS Order Date'
+
+relationship 4106be45-efa0-4aec-8ce5-d0c2cfb77ddf
+	fromColumn: 'Lead Time Events Measures'.AdviseDate
+	toColumn: 'Advise Date'.'Advise Date'
+
+relationship 911013e7-75ab-4a93-bf3d-ccc3e656503e
+	fromColumn: 'Lead Time Events Measures'.ATADate
+	toColumn: 'ATA Date'.'ATA Date'
+
+relationship 13ea061e-d85e-426b-8ddd-4ea4f3f9f521
+	fromColumn: 'Lead Time Events Measures'.CustomsDocCreatedOn
+	toColumn: 'Customs Doc Created On Date'.'Customs Doc Created On Date'
+
+relationship 8f201c21-fbc3-4938-801d-78a2077a0e33
+	fromColumn: 'Lead Time Events Measures'.DateUnloaded
+	toColumn: 'Unloading Date'.'Unloading Date'
+
+relationship 311fcc3a-d22d-49f2-bcbf-4f6d7be99519
+	fromColumn: 'Lead Time Events Measures'.OrderDate
+	toColumn: 'Order Date'.'Order Date'
+
+relationship 0d3badb4-2d50-4e30-9787-1164ee4207a6
+	fromColumn: 'Lead Time Events Measures'.ReleaseDate
+	toColumn: 'Release Date'.'Release Date'
+
+relationship 3edb71aa-1834-40cb-9276-095c131e19f3
+	fromColumn: 'Lead Time Events Measures'.ReleasedToTransport
+	toColumn: 'Released To Transport Date'.'Released To Transport Date'
+
+relationship 12671525-8bfa-4f39-95b2-a979071550dc
+	fromColumn: 'Lead Time Events Measures'.TMSEmptyReturnDate
+	toColumn: 'TMS Empty Return Date'.'TMS Empty Return Date'
+
+relationship d326bac7-776e-449e-93aa-633952d03298
+	fromColumn: 'Lead Time Events Measures'.TMSFullDropOffDate
+	toColumn: 'TMS Full Drop Off Date'.'TMS Full Drop Off Date'
+
+relationship 1e3399dd-5454-4dc7-9956-bf47e019fab2
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_LeadTimeStatus
+	toColumn: 'Lead Time Status'.SK_LeadTime_LeadTimeStatus
+
+relationship efe236fd-581d-47bf-aff2-ea75bab27b14
+	fromColumn: 'Lead Time Events Measures'.ETADate
+	toColumn: 'ETA Date'.'ETA Date'
+
+relationship 1b6f11cd-4f7c-4bf3-b318-456dfe35b5fd
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_Contact
+	toColumn: Customer.SK_LeadTime_Contact
+
+relationship 88e396dd-ccd1-4819-aa61-6bd250a9d318
+	fromColumn: 'Lead Time Events Measures'.FromDate
+	toColumn: 'Lead Time From Date'.'Lead Time From Date'
+
+relationship fa7ec2ee-2576-41ae-828f-23bb2ab6e908
+	fromColumn: 'Lead Time Events Measures'.ToDate
+	toColumn: 'Lead Time To Date'.'Lead Time To Date'
+
+relationship AutoDetected_54deacdd-ca05-4a8c-8473-015a031221a8
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_LeadTimeBucket
+	toColumn: 'Lead Time Bucket'.SK_LeadTime_LeadTimeBucket
+
+relationship AutoDetected_7d170ae4-d951-4597-9ebc-c926e8ccff9c
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_EventStatus
+	toColumn: 'Event Status'.SK_LeadTime_EventStatus
+
+relationship AutoDetected_55b77144-dad9-4f4b-b187-3e5574dfe6f7
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_TMSFullPickupLocation
+	toColumn: 'TMS Full Pickup Location'.SK_LeadTime_TMSFullPickupLocation
+
+relationship AutoDetected_3bdd8e4d-1b16-48f4-9799-c62d93c7ff41
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_TMSEmptyReturnLocation
+	toColumn: 'TMS Empty Return Location'.SK_LeadTime_TMSEmptyReturnLocation
+
+relationship AutoDetected_2eac1b2e-d424-478f-b99a-da26199426f3
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_TruckRouteReleased
+	toColumn: 'Truck Route Released'.SK_LeadTime_TruckRouteReleased
+
+relationship 025abeda-f6c5-4927-8931-1377bfb4c514
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime
+	toColumn: 'Lead Time Measures'.SK_FACT_LeadTime
+
+relationship a998f8c5-a635-4cb4-a13f-a01a7117ff40
+	crossFilteringBehavior: bothDirections
+	fromColumn: Good.SK_FACT_LeadTime
+	toColumn: 'Lead Time Measures'.SK_FACT_LeadTime
+
+relationship b7850ab7-4d2d-4ec7-a1b7-fcbdfe6eec15
+	isActive: false
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_LeadTimeBusinessDays
+	toColumn: 'Lead Time Days'.SK_LeadTimeDays
+
+relationship 6d600330-84d9-42cd-829d-1bc83d32773e
+	fromColumn: 'Lead Time Events Measures'.SK_LeadTime_LeadTimeDays
+	toColumn: 'Lead Time Days'.SK_LeadTimeDays
+

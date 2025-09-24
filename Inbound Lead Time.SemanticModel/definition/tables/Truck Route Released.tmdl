@@ -1,0 +1,38 @@
+table 'Truck Route Released'
+	lineageTag: da9e788b-94a9-4413-936d-37b8cef65920
+
+	column SK_LeadTime_TruckRouteReleased
+		dataType: int64
+		isHidden
+		formatString: 0
+		isAvailableInMdx: false
+		encodingHint: value
+		lineageTag: 18909cb3-3a9c-497f-93f1-1cb68c883f3f
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_TruckRouteReleased
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Truck Route Released'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 44c15fb7-1e51-49e1-b392-d35f0cd98530
+		summarizeBy: none
+		sourceColumn: Truck Route Released
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Truck Route Released' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    dim_LeadTime_TruckRouteReleased = Source{[Schema="dim",Item="LeadTime_TruckRouteReleased"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_TruckRouteReleased,{{"TruckRouteReleased", "Truck Route Released"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

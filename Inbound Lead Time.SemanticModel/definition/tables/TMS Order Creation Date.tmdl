@@ -1,0 +1,140 @@
+table 'TMS Order Creation Date'
+	isHidden
+	lineageTag: 55b83cb5-330d-4afb-92b4-c459786444ee
+	dataCategory: Time
+
+	column 'TMS Order Creation Date'
+		dataType: dateTime
+		isKey
+		formatString: Long Date
+		lineageTag: a0460548-5c9f-424a-be39-223c0fdd0d75
+		summarizeBy: none
+		sourceColumn: TMS Order Creation Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation TabularEditor_MarkAsDateKey = 1
+
+	column 'TMS Order Creation Year'
+		dataType: int64
+		formatString: 0
+		lineageTag: aecc73b8-8da9-441a-b06b-fd49d28f5b70
+		summarizeBy: sum
+		sourceColumn: TMS Order Creation Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Order Creation Quarter'
+		dataType: string
+		lineageTag: a7c0b641-de5e-4c03-b26a-901c8fd15192
+		summarizeBy: none
+		sourceColumn: TMS Order Creation Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Order Creation Month'
+		dataType: int64
+		formatString: 0
+		lineageTag: cce61d0e-36ef-47e5-b4a0-58640ee2e266
+		summarizeBy: sum
+		sourceColumn: TMS Order Creation Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Order Creation Month Name'
+		dataType: string
+		lineageTag: 5a2b2367-bc26-4bee-9aee-b6b6628e0430
+		summarizeBy: none
+		sourceColumn: TMS Order Creation Month Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Order Creation Day'
+		dataType: int64
+		formatString: 0
+		lineageTag: 6b56735c-2861-4e44-95bc-6dc1c6b1b128
+		summarizeBy: sum
+		sourceColumn: TMS Order Creation Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Order Creation Day of Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: e227bb78-1dd4-4e60-a324-bb5599b2dfb2
+		summarizeBy: sum
+		sourceColumn: TMS Order Creation Day of Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Order Creation Day of Week Name'
+		dataType: string
+		lineageTag: 5da421af-8fa1-44f4-8db3-85b9369b402b
+		summarizeBy: none
+		sourceColumn: TMS Order Creation Day of Week Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Order Creation Is Weekend'
+		dataType: string
+		lineageTag: f943ac08-2641-4b7f-8896-d63f1a1ab66f
+		summarizeBy: none
+		sourceColumn: TMS Order Creation Is Weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Order Creation Year-Month'
+		dataType: string
+		lineageTag: 35fd8d33-aabe-4dc2-ba34-4d84e1a07d7b
+		summarizeBy: none
+		sourceColumn: TMS Order Creation Year-Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Order Creation ISO Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1608f169-523f-4bc4-98bc-7c9d22a8c4b1
+		summarizeBy: sum
+		sourceColumn: TMS Order Creation ISO Week
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'TMS Order Creation Date' = m
+		mode: import
+		source =
+				let
+				    // Define Start and End Dates
+				    StartDate = #date(2020, 1, 1),
+				    EndDate = #date(2030, 12, 31),
+				
+				    // Generate a List of Dates
+				    DateList = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+				
+				    // Convert List to Table
+				    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}),
+				
+				    // Add Additional Date Columns
+				    AddYear = Table.AddColumn(DateTable, "Year", each Date.Year([Date]), Int64.Type),
+				    AddQuarter = Table.AddColumn(AddYear, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date]))),
+				    AddMonth = Table.AddColumn(AddQuarter, "Month", each Date.Month([Date]), Int64.Type),
+				    AddMonthName = Table.AddColumn(AddMonth, "Month Name", each Date.ToText([Date], "MMMM")),
+				    AddDay = Table.AddColumn(AddMonthName, "Day", each Date.Day([Date]), Int64.Type),
+				    AddDayOfWeek = Table.AddColumn(AddDay, "Day of Week", each Date.DayOfWeek([Date]) + 1, Int64.Type),
+				    AddDayOfWeekName = Table.AddColumn(AddDayOfWeek, "Day of Week Name", each Date.ToText([Date], "dddd")),
+				    AddIsWeekend = Table.AddColumn(AddDayOfWeekName, "Is Weekend", each if Date.DayOfWeek([Date]) >= 5 then "Yes" else "No"),
+				    AddYearMonth = Table.AddColumn(AddIsWeekend, "Year-Month", each Text.From(Date.Year([Date])) & "-" & Text.PadStart(Text.From(Date.Month([Date])), 2, "0")),
+				
+				    // Add ISO Week
+				    AddISOWeek = Table.AddColumn(AddYearMonth, "ISO Week", each Date.WeekOfYear([Date], Day.Monday), Int64.Type),
+				    #"Changed Type" = Table.TransformColumnTypes(AddISOWeek,{{"Date", type date}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Date", "TMS Order Creation Date"}, {"Year", "TMS Order Creation Year"}, {"Quarter", "TMS Order Creation Quarter"}, {"Month", "TMS Order Creation Month"}, {"Month Name", "TMS Order Creation Month Name"}, {"Day", "TMS Order Creation Day"}, {"Day of Week", "TMS Order Creation Day of Week"}, {"Day of Week Name", "TMS Order Creation Day of Week Name"}, {"Is Weekend", "TMS Order Creation Is Weekend"}, {"Year-Month", "TMS Order Creation Year-Month"}, {"ISO Week", "TMS Order Creation ISO Week"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

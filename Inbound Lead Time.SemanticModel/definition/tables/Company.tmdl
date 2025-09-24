@@ -1,0 +1,37 @@
+table Company
+	lineageTag: 89832229-33f1-43c0-a60b-f1f139b1c7c5
+
+	column SK_LeadTime_Company
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 58b091df-6c53-447c-beea-d62914bf2033
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_Company
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Company
+		dataType: string
+		lineageTag: 1c3ea2e7-b742-4584-b33d-146ee96ac6e9
+		summarizeBy: none
+		sourceColumn: Company
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Company = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    dim_LeadTime_Company = Source{[Schema="dim",Item="LeadTime_Company"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_Company,{{"FinancialCompanyName", "Company"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

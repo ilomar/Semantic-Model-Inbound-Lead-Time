@@ -1,0 +1,32 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.2.0/schema.json",
+  "name": "1a68572a83f6b4eef317",
+  "position": {
+    "x": 13.348188421943936,
+    "y": 56.4731048620705,
+    "z": 3000,
+    "height": 106.78550737555149,
+    "width": 347.05289897054234
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Weekly summary of containers arriving at the port, delivered to an MBN warehouse, unloaded, and returned empty."
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

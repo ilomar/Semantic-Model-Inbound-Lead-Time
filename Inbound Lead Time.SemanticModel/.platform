@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Inbound Lead Time"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "06aab7ec-d3f5-4fa2-b3e3-5738311eef66"
+  }
+}

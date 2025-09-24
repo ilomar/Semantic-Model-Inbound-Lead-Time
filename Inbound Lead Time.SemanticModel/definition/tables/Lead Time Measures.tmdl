@@ -1,0 +1,369 @@
+table 'Lead Time Measures'
+	isHidden
+	lineageTag: 30787761-44f4-4479-8691-d1518e3a06cb
+
+	column SK_FACT_LeadTime
+		dataType: int64
+		formatString: 0
+		lineageTag: effcfa9f-a385-4c59-80cc-d02b5c59d967
+		summarizeBy: none
+		sourceColumn: SK_FACT_LeadTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Doorlooptijd douane document'
+		dataType: int64
+		formatString: 0
+		lineageTag: e6a41b9f-0a67-4eaa-ab6d-317abd2c1643
+		summarizeBy: sum
+		sourceColumn: Doorlooptijd douane document
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Doorlooptijd ontvangst in TMS - depot out'
+		dataType: int64
+		formatString: 0
+		lineageTag: f598b08f-4d77-4533-a498-fb0bd3597ddf
+		summarizeBy: sum
+		sourceColumn: Doorlooptijd ontvangst in TMS - depot out
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Doorlooptijd ontvangst order in TMS - depot in'
+		dataType: int64
+		formatString: 0
+		lineageTag: 37409c0f-f836-49e0-b0e9-7de4ec70e1c2
+		summarizeBy: sum
+		sourceColumn: Doorlooptijd ontvangst order in TMS - depot in
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Doorlooptijd ATA <=> beschikbaar op Mbn magazijn'
+		dataType: int64
+		formatString: 0
+		lineageTag: e6f37e54-5bdf-4e5c-9d43-2c4c0c02fabd
+		summarizeBy: sum
+		sourceColumn: Doorlooptijd ATA <=> beschikbaar op Mbn magazijn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Doorlooptijd depot out/beschikbaar om te lossen - losdatum'
+		dataType: int64
+		formatString: 0
+		lineageTag: a930e738-adbf-4913-95ac-708c14eb762c
+		summarizeBy: sum
+		sourceColumn: Doorlooptijd depot out/beschikbaar om te lossen - losdatum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Losdatum - Depot in'
+		dataType: int64
+		formatString: 0
+		lineageTag: 7834818f-2f2c-4ebc-8040-d259ce18f040
+		summarizeBy: sum
+		sourceColumn: Losdatum - Depot in
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Doorlooptijd gelost - aanmaak factuur'
+		dataType: int64
+		formatString: 0
+		lineageTag: 94e7e0f9-c713-4dd7-8a26-f965232333aa
+		summarizeBy: sum
+		sourceColumn: Doorlooptijd gelost - aanmaak factuur
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Doorlooptijd ATA - Depot leeg binnen'
+		dataType: int64
+		formatString: 0
+		lineageTag: a32bc887-5ff9-4197-9a11-dc1488042183
+		summarizeBy: sum
+		sourceColumn: Doorlooptijd ATA - Depot leeg binnen
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Doorlooptijd Invoice posting date - ATA'
+		dataType: int64
+		formatString: 0
+		lineageTag: ff306163-8557-4e7c-817f-e95e87c124a2
+		summarizeBy: sum
+		sourceColumn: Doorlooptijd Invoice posting date - ATA
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Doorlooptijd Invoice paid - ATA'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1d5cc486-42f4-4841-9cd5-208d03132542
+		summarizeBy: sum
+		sourceColumn: Doorlooptijd Invoice paid - ATA
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Doorlooptijd aanmaak factuur <=> betaling'
+		dataType: int64
+		formatString: 0
+		lineageTag: 7a822c05-06c7-4007-b825-7007c5f88df6
+		summarizeBy: sum
+		sourceColumn: Doorlooptijd aanmaak factuur <=> betaling
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Doorlooptijd ATA - Unloading'
+		dataType: int64
+		formatString: 0
+		lineageTag: 76e81411-2692-472b-8fe9-fdda599fe763
+		summarizeBy: sum
+		sourceColumn: Doorlooptijd ATA - Unloading
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_Company
+		dataType: int64
+		formatString: 0
+		lineageTag: 31b41437-6c4c-4f57-9c1e-8e1ecc41e4c4
+		summarizeBy: sum
+		sourceColumn: SK_LeadTime_Company
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_Contact
+		dataType: int64
+		formatString: 0
+		lineageTag: 20f6ec4b-c054-4855-86a3-cfb6cc43d512
+		summarizeBy: sum
+		sourceColumn: SK_LeadTime_Contact
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_Container
+		dataType: int64
+		formatString: 0
+		lineageTag: 732f2c8c-82fe-4ecf-ad21-7ce09bf4ba2a
+		summarizeBy: sum
+		sourceColumn: SK_LeadTime_Container
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_Department
+		dataType: int64
+		formatString: 0
+		lineageTag: 78d9e971-4ffb-4c6a-9a00-5745530cb951
+		summarizeBy: sum
+		sourceColumn: SK_LeadTime_Department
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_FreightType
+		dataType: int64
+		formatString: 0
+		lineageTag: b2dc7d98-2b67-481c-bccc-7b632ffc45d9
+		summarizeBy: sum
+		sourceColumn: SK_LeadTime_FreightType
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_Order
+		dataType: int64
+		formatString: 0
+		lineageTag: 88c3d19d-3956-44b7-89a0-78bb37944c13
+		summarizeBy: sum
+		sourceColumn: SK_LeadTime_Order
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_Terminal
+		dataType: int64
+		formatString: 0
+		lineageTag: 6f21c51c-ad84-4b32-8b2f-e2ea1c9e8459
+		summarizeBy: sum
+		sourceColumn: SK_LeadTime_Terminal
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_TMSOrder
+		dataType: int64
+		formatString: 0
+		lineageTag: 8a74b84e-d7bc-4236-913f-9251acf461f6
+		summarizeBy: sum
+		sourceColumn: SK_LeadTime_TMSOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column SK_LeadTime_TransportCompany
+		dataType: int64
+		formatString: 0
+		lineageTag: 4a53753c-d755-47db-bb0d-77f226f70947
+		summarizeBy: sum
+		sourceColumn: SK_LeadTime_TransportCompany
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrderDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: b0281b11-6a44-411e-9482-b922de4b3a0e
+		summarizeBy: none
+		sourceColumn: OrderDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ETADate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 201e30d0-ab6d-41f7-b46f-c30a3b3ca906
+		summarizeBy: none
+		sourceColumn: ETADate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ATADate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 6d520d84-2124-42f1-b4e7-2f54ef526e71
+		summarizeBy: none
+		sourceColumn: ATADate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column AdviseDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 4e31d62e-c99e-4e45-b32f-f301b4af5b27
+		summarizeBy: none
+		sourceColumn: AdviseDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column DateUnloaded
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 18474eaa-507e-4875-aed6-94be04c0e9d0
+		summarizeBy: none
+		sourceColumn: DateUnloaded
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column CreatedOn
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 73bef0b2-cc50-4adb-9704-a46ceefb18a8
+		summarizeBy: none
+		sourceColumn: CreatedOn
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ReleasedToTransport
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 6f75abda-d2ff-4f6d-a7ca-a64d406d2002
+		summarizeBy: none
+		sourceColumn: ReleasedToTransport
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column TMSOrderDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: cb256d5e-8187-4fb5-97ab-ab21c48f57f8
+		summarizeBy: none
+		sourceColumn: TMSOrderDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column TMSFullDropOffDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: df75de7d-b782-4408-bd2d-f7e987e067f1
+		summarizeBy: none
+		sourceColumn: TMSFullDropOffDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column TMSEmptyReturnDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: b6240dd9-5928-4b6a-9ad8-77708ab08500
+		summarizeBy: none
+		sourceColumn: TMSEmptyReturnDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column TMSOrderCreationDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 7356bdb2-fa93-4856-b13f-3bae3467a5f1
+		summarizeBy: none
+		sourceColumn: TMSOrderCreationDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ReleaseDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 35968be9-2f66-4ceb-bc1e-25aa4139612f
+		summarizeBy: none
+		sourceColumn: ReleaseDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column InvoicePostingDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 060de6fc-af32-4f19-ac78-c4b4f461d241
+		summarizeBy: none
+		sourceColumn: InvoicePostingDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ClosedAtDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 5ae4bb23-7f72-476c-baea-a18fe6b87067
+		summarizeBy: none
+		sourceColumn: ClosedAtDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition 'Lead Time Measures' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    fact_LeadTime = Source{[Schema="fact",Item="LeadTime"]}[Data]
+				in
+				    fact_LeadTime
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

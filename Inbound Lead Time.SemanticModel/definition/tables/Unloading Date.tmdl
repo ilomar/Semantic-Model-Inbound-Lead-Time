@@ -1,0 +1,208 @@
+table 'Unloading Date'
+	lineageTag: 658a7af2-075d-4e22-a7fe-1cbbb2179d29
+	dataCategory: Time
+
+	column 'Unloading Date'
+		dataType: dateTime
+		isKey
+		formatString: d/mm/yyyy
+		lineageTag: d8b33e79-d033-4f4c-be2a-f83038c6905d
+		summarizeBy: none
+		sourceColumn: Unloading Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation TabularEditor_MarkAsDateKey = 1
+
+	column 'Unloading Year'
+		dataType: int64
+		formatString: 0
+		lineageTag: b3999e45-0293-456f-8a9f-6baee915a477
+		summarizeBy: sum
+		sourceColumn: Unloading Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unloading Quarter'
+		dataType: string
+		lineageTag: 51d12627-47d8-49f5-8cf9-15ced8d5ddae
+		summarizeBy: none
+		sourceColumn: Unloading Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unloading Month'
+		dataType: int64
+		formatString: 0
+		lineageTag: 9dd27a5a-8763-4753-b38b-ce58046facca
+		summarizeBy: sum
+		sourceColumn: Unloading Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unloading Month Name'
+		dataType: string
+		lineageTag: b02c7c72-2349-4fbc-9865-74a41781dda8
+		summarizeBy: none
+		sourceColumn: Unloading Month Name
+		sortByColumn: 'Unloading Month'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unloading Day'
+		dataType: int64
+		formatString: 0
+		lineageTag: 00f4a44b-b3f8-4bf7-8c57-4c1528d6c75a
+		summarizeBy: sum
+		sourceColumn: Unloading Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unloading Day of Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: 00c73ae9-5fbf-4567-9f64-1a87bb54d48e
+		summarizeBy: sum
+		sourceColumn: Unloading Day of Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unloading Day of Week Name'
+		dataType: string
+		lineageTag: 3f4af1e3-af7a-4a44-987a-819f94d8f11b
+		summarizeBy: none
+		sourceColumn: Unloading Day of Week Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unloading Date Is Weekend'
+		dataType: string
+		lineageTag: ebde0e49-fd61-4765-a030-e8572b826f92
+		summarizeBy: none
+		sourceColumn: Unloading Date Is Weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unloading Year-Month'
+		dataType: string
+		lineageTag: fa5414e8-b7fe-4dde-9c94-4d820ac35c3f
+		summarizeBy: none
+		sourceColumn: Unloading Year-Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unloading ISO Week'
+		dataType: string
+		lineageTag: 25ab2753-6502-4a3a-ba09-9cfcbc2a7479
+		summarizeBy: none
+		sourceColumn: Unloading ISO Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unloading Date Index'
+		dataType: int64
+		formatString: 0
+		lineageTag: 28fc4f93-085f-4cfa-b663-ec46acb7f4a8
+		summarizeBy: sum
+		sourceColumn: Unloading Date Index
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Unloading Date (Y-M-D)'
+		lineageTag: 5db6bf28-4e6b-49f8-937e-bc1820c12fd3
+
+		level 'Unloading Year'
+			lineageTag: e1edbc38-4aab-4f34-ba8c-cf57743d1716
+			column: 'Unloading Year'
+
+		level 'Unloading Year-Month'
+			lineageTag: 41476ad5-f38f-461b-94cb-ec6b1d27d3ae
+			column: 'Unloading Year-Month'
+
+		level 'Unloading Date'
+			lineageTag: 9ddeed78-9482-469f-81b4-3fe58087b67e
+			column: 'Unloading Date'
+
+	partition 'Unloading Date' = m
+		mode: import
+		source = ```
+				let
+				    // Define Start Date
+				    StartDate = #date(2023, 1, 1),
+				
+				    // Dynamically calculate the last day of next year
+				    CurrentYear = Date.Year(DateTime.FixedLocalNow()),
+				    EndDate = #date(CurrentYear + 1, 12, 31),
+				
+				    // Generate a List of Dates
+				    DateList = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+				
+				    // Convert List to Table
+				    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}),
+				
+				    // Add Additional Date Columns
+				    AddYear = Table.AddColumn(DateTable, "Year", each Date.Year([Date]), Int64.Type),
+				    AddQuarter = Table.AddColumn(AddYear, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date]))),
+				    AddMonth = Table.AddColumn(AddQuarter, "Month", each Date.Month([Date]), Int64.Type),
+				    AddMonthName = Table.AddColumn(AddMonth, "Month Name", each Date.ToText([Date], "MMMM")),
+				    AddDay = Table.AddColumn(AddMonthName, "Day", each Date.Day([Date]), Int64.Type),
+				    AddDayOfWeek = Table.AddColumn(AddDay, "Day of Week", each Date.DayOfWeek([Date]) + 1, Int64.Type),
+				    AddDayOfWeekName = Table.AddColumn(AddDayOfWeek, "Day of Week Name", each Date.ToText([Date], "dddd")),
+				    AddIsWeekend = Table.AddColumn(AddDayOfWeekName, "Is Weekend", each if Date.DayOfWeek([Date]) >= 5 then "Yes" else "No"),
+				    AddYearMonth = Table.AddColumn(AddIsWeekend, "Year-Month", each Text.From(Date.Year([Date])) & "-" & Text.PadStart(Text.From(Date.Month([Date])), 2, "0")),
+				
+				    // Add ISO Week column in ISO 8601 format
+				    AddISOWeek = Table.AddColumn(AddYearMonth, "ISO Week", each 
+				        let
+				            d = [Date],
+				            // Calculate the day-of-week with Monday as 0 (so Monday=0, Tuesday=1, …, Sunday=6)
+				            dayOfWeek = Date.DayOfWeek(d, Day.Monday),
+				            // For ISO week, find the "nearest Thursday" (which determines the week’s year)
+				            nearestThursday = Date.AddDays(d, 3 - dayOfWeek),
+				            isoYear = Date.Year(nearestThursday),
+				            isoWeekNumber = Date.WeekOfYear(nearestThursday, Day.Monday),
+				            // The ISO week runs Monday through Sunday.
+				            WeekStartDate = Date.StartOfWeek(d, Day.Monday),
+				            WeekEndDate = Date.AddDays(WeekStartDate, 6)
+				        in
+				            Text.From(isoYear) & "-W" & Text.PadStart(Text.From(isoWeekNumber), 2, "0") 
+				            & " (" & Date.ToText(WeekStartDate, "dd/MM/yyyy") 
+				            & " - " & Date.ToText(WeekEndDate, "dd/MM/yyyy") & ")"
+				    ),
+				
+				    // Rename Columns
+				    #"Renamed Columns" = Table.RenameColumns(AddISOWeek,{
+				        {"Date", "Unloading Date"}, 
+				        {"Year", "Unloading Year"}, 
+				        {"Quarter", "Unloading Quarter"}, 
+				        {"Month", "Unloading Month"}, 
+				        {"Month Name", "Unloading Month Name"}, 
+				        {"Day", "Unloading Day"}, 
+				        {"Day of Week", "Unloading Day of Week"}, 
+				        {"Day of Week Name", "Unloading Day of Week Name"}, 
+				        {"Is Weekend", "Unloading Date Is Weekend"}, 
+				        {"Year-Month", "Unloading Year-Month"}, 
+				        {"ISO Week", "Unloading ISO Week"}
+				    }),
+				
+				    // Change Data Types as needed
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns", {{"Unloading Date", type date}}),
+				
+				    // Get today's date
+				    TodayDate = Date.From(DateTime.FixedLocalNow()),
+				
+				    // Add the Relative Index column (today = 0, tomorrow = 1, yesterday = -1, etc.)
+				    AddRelativeIndex = Table.AddColumn(#"Changed Type", "RelativeIndex", each Duration.Days([Unloading Date] - TodayDate), Int64.Type),
+				    #"Renamed Columns1" = Table.RenameColumns(AddRelativeIndex,{{"RelativeIndex", "Unloading Date Index"}}),
+				    #"Changed Type with Locale" = Table.TransformColumnTypes(#"Renamed Columns1", {{"Unloading Date", type date}}, "nl-BE")
+				    
+				in
+				    #"Changed Type with Locale"
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

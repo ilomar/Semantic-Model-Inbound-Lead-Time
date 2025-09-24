@@ -1,0 +1,52 @@
+table 'Lead Time Status'
+	lineageTag: 670a6393-95d5-482c-b402-09b16e696869
+
+	column SK_LeadTime_LeadTimeStatus
+		dataType: int64
+		isHidden
+		formatString: 0
+		isAvailableInMdx: false
+		encodingHint: value
+		lineageTag: abb26c75-67e7-4c36-ba15-e60cd8ecbda8
+		summarizeBy: sum
+		sourceColumn: SK_LeadTime_LeadTimeStatus
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time Status'
+		dataType: string
+		lineageTag: 0754d455-0cf1-46aa-9cb4-b1ba7894f11f
+		summarizeBy: none
+		sourceColumn: Lead Time Status
+		sortByColumn: LeadTimeStatusSort
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column LeadTimeStatusSort
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 5723f421-110b-424d-b49b-11b16b65661b
+		summarizeBy: none
+		sourceColumn: LeadTimeStatusSort
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Lead Time Status' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    dim_LeadTime_LeadTimeStatus = Source{[Schema="dim",Item="LeadTime_LeadTimeStatus"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_LeadTimeStatus,{{"LeadTimeStatus", "Lead Time Status"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

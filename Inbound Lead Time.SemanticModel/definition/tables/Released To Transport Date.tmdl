@@ -1,0 +1,157 @@
+table 'Released To Transport Date'
+	isHidden
+	lineageTag: 46a99d4b-3178-4714-ab15-f727e55e9c91
+	dataCategory: Time
+
+	column 'Released To Transport Date'
+		dataType: dateTime
+		isKey
+		formatString: Short Date
+		lineageTag: c8c8f9ce-1f8b-44a2-991b-db6568377d65
+		summarizeBy: none
+		sourceColumn: Released To Transport Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation TabularEditor_MarkAsDateKey = 1
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Released To Transport Year'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1dab344e-7107-4b90-979e-ba9d29e4c800
+		summarizeBy: none
+		sourceColumn: Released To Transport Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Released To Transport Quarter'
+		dataType: string
+		lineageTag: 2471ce4a-f6f7-45d3-b275-dc515f0dddd6
+		summarizeBy: none
+		sourceColumn: Released To Transport Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Released To Transport Month'
+		dataType: int64
+		formatString: 0
+		lineageTag: 3d048da7-afe0-4da2-852c-10cce3af661a
+		summarizeBy: none
+		sourceColumn: Released To Transport Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Released To Transport Month Name'
+		dataType: string
+		lineageTag: 6b8de194-1e32-4334-b5c4-50edc6f6288d
+		summarizeBy: none
+		sourceColumn: Released To Transport Month Name
+		sortByColumn: 'Released To Transport Month'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Released To Transport Day'
+		dataType: int64
+		formatString: 0
+		lineageTag: 6b6f7c55-893c-4522-b5ff-6b374db8f2c4
+		summarizeBy: none
+		sourceColumn: Released To Transport Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Released To Transport Day of Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: 6e7f1a29-93f3-44ed-bff3-8537faf8f597
+		summarizeBy: none
+		sourceColumn: Released To Transport Day of Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Released To Transport Day of Week Name'
+		dataType: string
+		lineageTag: 4eb45156-1f31-4938-a9b5-0447abdcf3f8
+		summarizeBy: none
+		sourceColumn: Released To Transport Day of Week Name
+		sortByColumn: 'Released To Transport Day of Week'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Released To Transport Is Weekend'
+		dataType: string
+		lineageTag: df2e1443-c862-4cf6-9d51-1b7538dae9dd
+		summarizeBy: none
+		sourceColumn: Released To Transport Is Weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Released To Transport Year-Month'
+		dataType: string
+		lineageTag: 0be9c2c8-f1bb-4e20-92c3-d75f445323f8
+		summarizeBy: none
+		sourceColumn: Released To Transport Year-Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Released To Transport ISO Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: cd7f5e88-ae8a-4c1c-a22b-1c37231436fb
+		summarizeBy: none
+		sourceColumn: Released To Transport ISO Week
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Released To Transport Date (Y-M-D)'
+		lineageTag: 31a2e364-5bd9-45d1-96f4-ba53c9a575f8
+
+		level 'Released To Transport Month'
+			lineageTag: 44f8a5fd-f6a5-41e0-85dd-656619e9a6dd
+			column: 'Released To Transport Month'
+
+		level 'Released To Transport Year'
+			lineageTag: 0ba76b05-0703-4147-9178-ca4349e42530
+			column: 'Released To Transport Year'
+
+		level 'Released To Transport Date'
+			lineageTag: 50b8ce32-32ab-4727-bb94-44e7903ecd4a
+			column: 'Released To Transport Date'
+
+	partition 'Released To Transport Date' = m
+		mode: import
+		source =
+				let
+				    // Define Start and End Dates
+				    StartDate = #date(2020, 1, 1),
+				    EndDate = #date(2030, 12, 31),
+				
+				    // Generate a List of Dates
+				    DateList = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+				
+				    // Convert List to Table
+				    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}),
+				
+				    // Add Additional Date Columns
+				    AddYear = Table.AddColumn(DateTable, "Year", each Date.Year([Date]), Int64.Type),
+				    AddQuarter = Table.AddColumn(AddYear, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date]))),
+				    AddMonth = Table.AddColumn(AddQuarter, "Month", each Date.Month([Date]), Int64.Type),
+				    AddMonthName = Table.AddColumn(AddMonth, "Month Name", each Date.ToText([Date], "MMMM")),
+				    AddDay = Table.AddColumn(AddMonthName, "Day", each Date.Day([Date]), Int64.Type),
+				    AddDayOfWeek = Table.AddColumn(AddDay, "Day of Week", each Date.DayOfWeek([Date]) + 1, Int64.Type),
+				    AddDayOfWeekName = Table.AddColumn(AddDayOfWeek, "Day of Week Name", each Date.ToText([Date], "dddd")),
+				    AddIsWeekend = Table.AddColumn(AddDayOfWeekName, "Is Weekend", each if Date.DayOfWeek([Date]) >= 5 then "Yes" else "No"),
+				    AddYearMonth = Table.AddColumn(AddIsWeekend, "Year-Month", each Text.From(Date.Year([Date])) & "-" & Text.PadStart(Text.From(Date.Month([Date])), 2, "0")),
+				
+				    // Add ISO Week
+				    AddISOWeek = Table.AddColumn(AddYearMonth, "ISO Week", each Date.WeekOfYear([Date], Day.Monday), Int64.Type),
+				    #"Changed Type" = Table.TransformColumnTypes(AddISOWeek,{{"Date", type date}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Date", "Released To Transport Date"}, {"Year", "Released To Transport Year"}, {"Quarter", "Released To Transport Quarter"}, {"Month", "Released To Transport Month"}, {"Month Name", "Released To Transport Month Name"}, {"Day", "Released To Transport Day"}, {"Day of Week", "Released To Transport Day of Week"}, {"Day of Week Name", "Released To Transport Day of Week Name"}, {"Is Weekend", "Released To Transport Is Weekend"}, {"Year-Month", "Released To Transport Year-Month"}, {"ISO Week", "Released To Transport ISO Week"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

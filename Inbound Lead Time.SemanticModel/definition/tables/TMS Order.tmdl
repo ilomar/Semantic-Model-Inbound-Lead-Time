@@ -1,0 +1,45 @@
+table 'TMS Order'
+	lineageTag: aec3a500-009d-47b2-8b8a-575a4397b779
+
+	column SK_LeadTime_TMSOrder
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 6596fcb1-ab8d-4839-a284-cd616f4a41dd
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_TMSOrder
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Order No.'
+		dataType: string
+		lineageTag: c8dae404-cf11-4f76-8bda-353fb42b1466
+		summarizeBy: none
+		sourceColumn: TMS Order No.
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unique Reference'
+		dataType: string
+		lineageTag: 7ba925c3-fc21-4d80-bba1-fba4fc00121c
+		summarizeBy: none
+		sourceColumn: Unique Reference
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'TMS Order' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    dim_LeadTime_TMSOrder = Source{[Schema="dim",Item="LeadTime_TMSOrder"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_TMSOrder,{{"TMSOrderNo", "TMS Order No."}, {"UniqueReference", "Unique Reference"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

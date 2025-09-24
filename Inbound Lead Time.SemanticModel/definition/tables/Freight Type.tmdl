@@ -1,0 +1,37 @@
+table 'Freight Type'
+	lineageTag: b2ec9f85-a626-45d4-a082-7c552b4e7634
+
+	column SK_LeadTime_FreightType
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 5adeb58c-71ea-421d-a1bd-1458044e8be4
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_FreightType
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Freight Type'
+		dataType: string
+		lineageTag: 526c3145-dc4f-4ed5-b5c9-0d7a69c23af2
+		summarizeBy: none
+		sourceColumn: Freight Type
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Freight Type' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    dim_LeadTime_FreightType = Source{[Schema="dim",Item="LeadTime_FreightType"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_FreightType,{{"FreightType", "Freight Type"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

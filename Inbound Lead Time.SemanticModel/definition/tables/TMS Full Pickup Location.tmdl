@@ -1,0 +1,86 @@
+table 'TMS Full Pickup Location'
+	lineageTag: 6e773be5-7de0-42f8-9784-16ffb3fc6581
+
+	column SK_LeadTime_TMSFullPickupLocation
+		dataType: int64
+		isHidden
+		formatString: 0
+		isAvailableInMdx: false
+		encodingHint: value
+		lineageTag: 6e5cf5e9-f691-4ec6-934a-b8bddb2529d5
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_TMSFullPickupLocation
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Full Pickup Address No.'
+		dataType: int64
+		formatString: 0
+		lineageTag: afddf6b7-8d8e-4aad-bff0-d38f269dfd94
+		summarizeBy: none
+		sourceColumn: TMS Full Pickup Address No.
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Full Pickup Address Name'
+		dataType: string
+		lineageTag: ac9fe582-831a-4174-bca3-741018365152
+		summarizeBy: none
+		sourceColumn: TMS Full Pickup Address Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Street
+		dataType: string
+		lineageTag: 00db9533-ee78-41db-b136-2ea2c0484e16
+		summarizeBy: none
+		sourceColumn: Street
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Postal Code'
+		dataType: string
+		lineageTag: 917ef43d-c74e-49b8-a1b2-7a650019a7f3
+		summarizeBy: none
+		sourceColumn: Postal Code
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: f680e61d-944c-488a-83bf-2b64d0db0114
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Country Code'
+		dataType: string
+		lineageTag: 58dedf4a-08b1-4b5d-8dac-ba8505b3fd41
+		summarizeBy: none
+		sourceColumn: Country Code
+
+		annotation SummarizationSetBy = Automatic
+
+	column Type
+		dataType: string
+		lineageTag: fa28d0cf-6a5e-4c65-ab9b-3138a138066c
+		summarizeBy: none
+		sourceColumn: Type
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'TMS Full Pickup Location' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse"),
+				    dim_LeadTime_TMSFullPickupLocation = Source{[Schema="dim",Item="LeadTime_TMSFullPickupLocation"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_TMSFullPickupLocation,{{"TMSFullPickupAddressNo", "TMS Full Pickup Address No."}, {"TMSFullPickupAddressName", "TMS Full Pickup Address Name"}, {"PostalCode", "Postal Code"}, {"CountryCode", "Country Code"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,49 @@
+table 'Event Status'
+	lineageTag: d224fd74-dacb-4b27-9100-34ccbfccca72
+
+	column SK_LeadTime_EventStatus
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: c16953f4-f586-400d-b3ee-dfb63903d6ff
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_EventStatus
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Event Status'
+		dataType: string
+		lineageTag: 6f2ba9c6-f2a3-4afe-a570-3319b1bad0fc
+		summarizeBy: none
+		sourceColumn: Event Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column EventStatusSort
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ea00dfd3-9bbe-4e3d-8224-9b302cc980c3
+		summarizeBy: none
+		sourceColumn: EventStatusSort
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Event Status' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    dim_LeadTime_EventStatus = Source{[Schema="dim",Item="LeadTime_EventStatus"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_EventStatus,{{"EventStatus", "Event Status"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

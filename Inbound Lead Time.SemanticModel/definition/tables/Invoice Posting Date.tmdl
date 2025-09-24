@@ -1,0 +1,157 @@
+table 'Invoice Posting Date'
+	isHidden
+	lineageTag: f2113d7d-2d71-4aab-87c3-a48af34dab28
+	dataCategory: Time
+
+	column 'Invoice Posting Date'
+		dataType: dateTime
+		isKey
+		formatString: Short Date
+		lineageTag: 4d077eaa-be82-49fc-80ee-3402b596a9c9
+		summarizeBy: none
+		sourceColumn: Invoice Posting Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation TabularEditor_MarkAsDateKey = 1
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Invoice Posting Year'
+		dataType: int64
+		formatString: 0
+		lineageTag: e7e56389-ad41-4521-89f5-aa750ad79cab
+		summarizeBy: none
+		sourceColumn: Invoice Posting Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Invoice Posting Quarter'
+		dataType: string
+		lineageTag: b067ddcf-bcfe-47f0-acbb-fd9a67951c5e
+		summarizeBy: none
+		sourceColumn: Invoice Posting Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Invoice Posting Month'
+		dataType: int64
+		formatString: 0
+		lineageTag: a6bb7ce3-7ab8-4aed-a5ee-e426a8bd6d68
+		summarizeBy: none
+		sourceColumn: Invoice Posting Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Invoice Posting Month Name'
+		dataType: string
+		lineageTag: dc4930cf-114f-420e-8487-4a82872e19e4
+		summarizeBy: none
+		sourceColumn: Invoice Posting Month Name
+		sortByColumn: 'Invoice Posting Month'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Invoice Posting Day'
+		dataType: int64
+		formatString: 0
+		lineageTag: 22a47f63-614c-41dd-b907-541b84fd1fe1
+		summarizeBy: none
+		sourceColumn: Invoice Posting Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Invoice Posting Day of Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: c2b2be7b-7bf0-4504-ade8-edd6e5868180
+		summarizeBy: none
+		sourceColumn: Invoice Posting Day of Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Invoice Posting Day of Week Name'
+		dataType: string
+		lineageTag: 1902720f-0e28-45e8-840f-de154d1e3e96
+		summarizeBy: none
+		sourceColumn: Invoice Posting Day of Week Name
+		sortByColumn: 'Invoice Posting Day of Week'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Invoice Posting Is Weekend'
+		dataType: string
+		lineageTag: d24a7539-25d6-4568-bb42-8bc4964bae7c
+		summarizeBy: none
+		sourceColumn: Invoice Posting Is Weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Invoice Posting Year-Month'
+		dataType: string
+		lineageTag: c8ca788b-a195-49d4-a3f4-bf7a2fac4f0d
+		summarizeBy: none
+		sourceColumn: Invoice Posting Year-Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Invoice Posting ISO Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: 171da0de-a0d4-4811-8982-85c87a1b4720
+		summarizeBy: none
+		sourceColumn: Invoice Posting ISO Week
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Invoice Posting Date (Y-M-D)'
+		lineageTag: 0f457f15-ba4f-4103-8f02-b42f46b1ed0a
+
+		level 'Invoice Posting Year'
+			lineageTag: 66c27e1c-6d1a-4407-8271-4c034fd20c46
+			column: 'Invoice Posting Year'
+
+		level 'Invoice Posting Month'
+			lineageTag: b29d575c-d414-42eb-85ca-6e08fcb9f25d
+			column: 'Invoice Posting Month'
+
+		level 'Invoice Posting Date'
+			lineageTag: 81924f1f-c58f-4fff-9a1f-927d4ed903ed
+			column: 'Invoice Posting Date'
+
+	partition 'Invoice Posting Date' = m
+		mode: import
+		source =
+				let
+				    // Define Start and End Dates
+				    StartDate = #date(2020, 1, 1),
+				    EndDate = #date(2030, 12, 31),
+				
+				    // Generate a List of Dates
+				    DateList = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+				
+				    // Convert List to Table
+				    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}),
+				
+				    // Add Additional Date Columns
+				    AddYear = Table.AddColumn(DateTable, "Year", each Date.Year([Date]), Int64.Type),
+				    AddQuarter = Table.AddColumn(AddYear, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date]))),
+				    AddMonth = Table.AddColumn(AddQuarter, "Month", each Date.Month([Date]), Int64.Type),
+				    AddMonthName = Table.AddColumn(AddMonth, "Month Name", each Date.ToText([Date], "MMMM")),
+				    AddDay = Table.AddColumn(AddMonthName, "Day", each Date.Day([Date]), Int64.Type),
+				    AddDayOfWeek = Table.AddColumn(AddDay, "Day of Week", each Date.DayOfWeek([Date]) + 1, Int64.Type),
+				    AddDayOfWeekName = Table.AddColumn(AddDayOfWeek, "Day of Week Name", each Date.ToText([Date], "dddd")),
+				    AddIsWeekend = Table.AddColumn(AddDayOfWeekName, "Is Weekend", each if Date.DayOfWeek([Date]) >= 5 then "Yes" else "No"),
+				    AddYearMonth = Table.AddColumn(AddIsWeekend, "Year-Month", each Text.From(Date.Year([Date])) & "-" & Text.PadStart(Text.From(Date.Month([Date])), 2, "0")),
+				
+				    // Add ISO Week
+				    AddISOWeek = Table.AddColumn(AddYearMonth, "ISO Week", each Date.WeekOfYear([Date], Day.Monday), Int64.Type),
+				    #"Changed Type" = Table.TransformColumnTypes(AddISOWeek,{{"Date", type date}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Date", "Invoice Posting Date"}, {"Year", "Invoice Posting Year"}, {"Quarter", "Invoice Posting Quarter"}, {"Month", "Invoice Posting Month"}, {"Month Name", "Invoice Posting Month Name"}, {"Day", "Invoice Posting Day"}, {"Day of Week", "Invoice Posting Day of Week"}, {"Day of Week Name", "Invoice Posting Day of Week Name"}, {"Is Weekend", "Invoice Posting Is Weekend"}, {"Year-Month", "Invoice Posting Year-Month"}, {"ISO Week", "Invoice Posting ISO Week"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

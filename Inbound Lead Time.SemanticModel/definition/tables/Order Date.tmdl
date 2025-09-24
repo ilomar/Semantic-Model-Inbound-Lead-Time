@@ -1,0 +1,156 @@
+table 'Order Date'
+	lineageTag: b81b46b4-6447-4b3b-a8f9-644adf18e318
+	dataCategory: Time
+
+	column 'Order Date'
+		dataType: dateTime
+		isKey
+		formatString: d/mm/yyyy
+		lineageTag: 12bb28d3-3339-4baf-8822-effd0c44b4dd
+		summarizeBy: none
+		sourceColumn: Order Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation TabularEditor_MarkAsDateKey = 1
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Order Year'
+		dataType: int64
+		formatString: 0
+		lineageTag: 7353e28f-7b49-4e5a-825c-5753412bac12
+		summarizeBy: none
+		sourceColumn: Order Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Quarter'
+		dataType: string
+		lineageTag: 62f969ff-d8cf-4a84-a2fb-e1628a67de26
+		summarizeBy: none
+		sourceColumn: Order Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Month'
+		dataType: int64
+		formatString: 0
+		lineageTag: 3d8813ce-6627-4fe7-a18f-8d6e6b9f319c
+		summarizeBy: none
+		sourceColumn: Order Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Month Name'
+		dataType: string
+		lineageTag: d79e14af-8652-4d35-a447-f5307bf0daad
+		summarizeBy: none
+		sourceColumn: Order Month Name
+		sortByColumn: 'Order Month'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Day'
+		dataType: int64
+		formatString: 0
+		lineageTag: b5224784-dbb4-4674-b251-ea47abce33cd
+		summarizeBy: none
+		sourceColumn: Order Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Day of Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: d633eade-33fd-47bd-8e29-eed788912064
+		summarizeBy: none
+		sourceColumn: Order Day of Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Day of Week Name'
+		dataType: string
+		lineageTag: 9f36f511-2cf5-4cbc-94f0-02f4d4acc57a
+		summarizeBy: none
+		sourceColumn: Order Day of Week Name
+		sortByColumn: 'Order Day of Week'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Is Weekend'
+		dataType: string
+		lineageTag: b351204f-63ec-463a-993c-38616d15749b
+		summarizeBy: none
+		sourceColumn: Order Is Weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Year-Month'
+		dataType: string
+		lineageTag: bbb26680-20a5-4c35-a4ee-a9a216c9487c
+		summarizeBy: none
+		sourceColumn: Order Year-Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order ISO Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: 6d9f868c-54bd-40c2-a788-97687ba56c6c
+		summarizeBy: none
+		sourceColumn: Order ISO Week
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Order Date (Y-M-D)'
+		lineageTag: 05486cf2-3572-4e77-bc63-69c9ab233338
+
+		level 'Order Year'
+			lineageTag: 401a40b5-0750-4b7d-bec9-fe15e6cba9e6
+			column: 'Order Year'
+
+		level 'Order Month'
+			lineageTag: 8555e3f9-ccc7-4c4e-a94a-e0d70c561b9c
+			column: 'Order Month'
+
+		level 'Order Date'
+			lineageTag: e4d694c7-03d3-41f3-b82e-3f246487a4f6
+			column: 'Order Date'
+
+	partition 'Order Date' = m
+		mode: import
+		source =
+				let
+				    // Define Start and End Dates
+				    StartDate = #date(2020, 1, 1),
+				    EndDate = #date(2030, 12, 31),
+				
+				    // Generate a List of Dates
+				    DateList = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+				
+				    // Convert List to Table
+				    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}),
+				
+				    // Add Additional Date Columns
+				    AddYear = Table.AddColumn(DateTable, "Year", each Date.Year([Date]), Int64.Type),
+				    AddQuarter = Table.AddColumn(AddYear, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date]))),
+				    AddMonth = Table.AddColumn(AddQuarter, "Month", each Date.Month([Date]), Int64.Type),
+				    AddMonthName = Table.AddColumn(AddMonth, "Month Name", each Date.ToText([Date], "MMMM")),
+				    AddDay = Table.AddColumn(AddMonthName, "Day", each Date.Day([Date]), Int64.Type),
+				    AddDayOfWeek = Table.AddColumn(AddDay, "Day of Week", each Date.DayOfWeek([Date]) + 1, Int64.Type),
+				    AddDayOfWeekName = Table.AddColumn(AddDayOfWeek, "Day of Week Name", each Date.ToText([Date], "dddd")),
+				    AddIsWeekend = Table.AddColumn(AddDayOfWeekName, "Is Weekend", each if Date.DayOfWeek([Date]) >= 5 then "Yes" else "No"),
+				    AddYearMonth = Table.AddColumn(AddIsWeekend, "Year-Month", each Text.From(Date.Year([Date])) & "-" & Text.PadStart(Text.From(Date.Month([Date])), 2, "0")),
+				
+				    // Add ISO Week
+				    AddISOWeek = Table.AddColumn(AddYearMonth, "ISO Week", each Date.WeekOfYear([Date], Day.Monday), Int64.Type),
+				    #"Changed Type" = Table.TransformColumnTypes(AddISOWeek,{{"Date", type date}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Date", "Order Date"}, {"Year", "Order Year"}, {"Quarter", "Order Quarter"}, {"Month", "Order Month"}, {"Month Name", "Order Month Name"}, {"Day", "Order Day"}, {"Day of Week", "Order Day of Week"}, {"Day of Week Name", "Order Day of Week Name"}, {"Is Weekend", "Order Is Weekend"}, {"Year-Month", "Order Year-Month"}, {"ISO Week", "Order ISO Week"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

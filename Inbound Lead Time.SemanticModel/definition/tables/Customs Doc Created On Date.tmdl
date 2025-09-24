@@ -1,0 +1,157 @@
+table 'Customs Doc Created On Date'
+	isHidden
+	lineageTag: 21544a8a-8c2a-46e0-b328-c92ac87ce0e4
+	dataCategory: Time
+
+	column 'Customs Doc Created On Date'
+		dataType: dateTime
+		isKey
+		formatString: Short Date
+		lineageTag: 0d42390d-eb56-4cbf-81de-dce70281e62d
+		summarizeBy: none
+		sourceColumn: Customs Doc Created On Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation TabularEditor_MarkAsDateKey = 1
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Customs Doc Created On Year'
+		dataType: int64
+		formatString: 0
+		lineageTag: 700d44b5-9e43-4318-b491-f6d1e45c5762
+		summarizeBy: none
+		sourceColumn: Customs Doc Created On Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customs Doc Created On Quarter'
+		dataType: string
+		lineageTag: 77debc0c-660a-413d-9a51-025674b386ff
+		summarizeBy: none
+		sourceColumn: Customs Doc Created On Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customs Doc Created On Month'
+		dataType: int64
+		formatString: 0
+		lineageTag: b93cd9d5-6489-4b33-a1b0-1fe25b88b4cb
+		summarizeBy: none
+		sourceColumn: Customs Doc Created On Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customs Doc Created On Month Name'
+		dataType: string
+		lineageTag: c5d6c60e-9cea-47b7-a91b-e2e2db5c5ef7
+		summarizeBy: none
+		sourceColumn: Customs Doc Created On Month Name
+		sortByColumn: 'Customs Doc Created On Month'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customs Doc Created On Day'
+		dataType: int64
+		formatString: 0
+		lineageTag: fc73559f-5efc-441f-acd1-6e6a5949e930
+		summarizeBy: none
+		sourceColumn: Customs Doc Created On Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customs Doc Created On Day of Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: cbdb2027-ca1c-4121-b38c-b656ddcecdd1
+		summarizeBy: none
+		sourceColumn: Customs Doc Created On Day of Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customs Doc Created On Day of Week Name'
+		dataType: string
+		lineageTag: 2bbede81-fe5b-4b54-9a6d-258853485d61
+		summarizeBy: none
+		sourceColumn: Customs Doc Created On Day of Week Name
+		sortByColumn: 'Customs Doc Created On Day of Week'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customs Doc Created On Is Weekend'
+		dataType: string
+		lineageTag: 84616f06-fbc8-47a5-8447-409d3363a4ea
+		summarizeBy: none
+		sourceColumn: Customs Doc Created On Is Weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customs Doc Created On Year-Month'
+		dataType: string
+		lineageTag: cf7a305b-4838-4a98-8c71-f8688f6930d0
+		summarizeBy: none
+		sourceColumn: Customs Doc Created On Year-Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customs Doc Created On Year-MonthISO Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: 14b003e0-bf6f-41ef-91be-9e922fbebccf
+		summarizeBy: none
+		sourceColumn: Customs Doc Created On Year-MonthISO Week
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Customs Doc Created On Date (Y-M-D)'
+		lineageTag: 05ff8e00-5358-462f-9bee-c116e8302172
+
+		level 'Customs Doc Created On Year'
+			lineageTag: 9d1ff390-f8c0-40d3-84d5-30c48ec91c04
+			column: 'Customs Doc Created On Year'
+
+		level 'Customs Doc Created On Month'
+			lineageTag: fa1e9c6b-1e75-4009-acc3-939e0e6d67f2
+			column: 'Customs Doc Created On Month'
+
+		level 'Customs Doc Created On Date'
+			lineageTag: 957a2a5c-8cda-494e-b4b6-7484402aa391
+			column: 'Customs Doc Created On Date'
+
+	partition 'Customs Doc Created On Date' = m
+		mode: import
+		source =
+				let
+				    // Define Start and End Dates
+				    StartDate = #date(2020, 1, 1),
+				    EndDate = #date(2030, 12, 31),
+				
+				    // Generate a List of Dates
+				    DateList = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+				
+				    // Convert List to Table
+				    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}),
+				
+				    // Add Additional Date Columns
+				    AddYear = Table.AddColumn(DateTable, "Year", each Date.Year([Date]), Int64.Type),
+				    AddQuarter = Table.AddColumn(AddYear, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date]))),
+				    AddMonth = Table.AddColumn(AddQuarter, "Month", each Date.Month([Date]), Int64.Type),
+				    AddMonthName = Table.AddColumn(AddMonth, "Month Name", each Date.ToText([Date], "MMMM")),
+				    AddDay = Table.AddColumn(AddMonthName, "Day", each Date.Day([Date]), Int64.Type),
+				    AddDayOfWeek = Table.AddColumn(AddDay, "Day of Week", each Date.DayOfWeek([Date]) + 1, Int64.Type),
+				    AddDayOfWeekName = Table.AddColumn(AddDayOfWeek, "Day of Week Name", each Date.ToText([Date], "dddd")),
+				    AddIsWeekend = Table.AddColumn(AddDayOfWeekName, "Is Weekend", each if Date.DayOfWeek([Date]) >= 5 then "Yes" else "No"),
+				    AddYearMonth = Table.AddColumn(AddIsWeekend, "Year-Month", each Text.From(Date.Year([Date])) & "-" & Text.PadStart(Text.From(Date.Month([Date])), 2, "0")),
+				
+				    // Add ISO Week
+				    AddISOWeek = Table.AddColumn(AddYearMonth, "ISO Week", each Date.WeekOfYear([Date], Day.Monday), Int64.Type),
+				    #"Changed Type" = Table.TransformColumnTypes(AddISOWeek,{{"Date", type date}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Date", "Customs Doc Created On Date"}, {"Year", "Customs Doc Created On Year"}, {"Quarter", "Customs Doc Created On Quarter"}, {"Month", "Customs Doc Created On Month"}, {"Month Name", "Customs Doc Created On Month Name"}, {"Day", "Customs Doc Created On Day"}, {"Day of Week", "Customs Doc Created On Day of Week"}, {"Day of Week Name", "Customs Doc Created On Day of Week Name"}, {"Is Weekend", "Customs Doc Created On Is Weekend"}, {"Year-Month", "Customs Doc Created On Year-Month"}, {"ISO Week", "Customs Doc Created On Year-MonthISO Week"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

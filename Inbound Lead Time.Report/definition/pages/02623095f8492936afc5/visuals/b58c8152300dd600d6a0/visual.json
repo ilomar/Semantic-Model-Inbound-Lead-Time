@@ -1,0 +1,72 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.2.0/schema.json",
+  "name": "b58c8152300dd600d6a0",
+  "position": {
+    "x": 9.98266897746967,
+    "y": 197.157712305026,
+    "z": 1000,
+    "height": 180.31195840554591,
+    "width": 656.98440207972271,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Lead Time Days"
+                    }
+                  },
+                  "Property": "Lead Time Days"
+                }
+              },
+              "queryRef": "Lead Time Days.Lead Time Days",
+              "nativeQueryRef": "Lead Time Days",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Lead Time Events Measures"
+                    }
+                  },
+                  "Property": "Containers Currently In Stage"
+                }
+              },
+              "queryRef": "Lead Time Events Measures.Containers Currently In Stage",
+              "nativeQueryRef": "Containers Currently In Stage"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "labels": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

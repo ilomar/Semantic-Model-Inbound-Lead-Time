@@ -1,0 +1,45 @@
+table Customer
+	lineageTag: 3687a09b-d2b5-42f8-aeff-46f35a9af1b7
+
+	column SK_LeadTime_Contact
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: a744de1d-63d5-4d5c-9dc7-ce90c7a8eadf
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_Contact
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer Code'
+		dataType: string
+		lineageTag: 2bcf432c-3f6e-414d-8e3a-839c77242734
+		summarizeBy: none
+		sourceColumn: Customer Code
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer Name'
+		dataType: string
+		lineageTag: 557db179-63cc-4da9-b076-91f93db5303b
+		summarizeBy: none
+		sourceColumn: Customer Name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Customer = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    dim_LeadTime_Contact = Source{[Schema="dim",Item="LeadTime_Customer"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_Contact,{{"CustomerCode", "Customer Code"}, {"CustomerName", "Customer Name"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

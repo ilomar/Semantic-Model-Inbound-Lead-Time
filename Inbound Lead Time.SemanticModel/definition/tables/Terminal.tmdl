@@ -1,0 +1,54 @@
+table Terminal
+	lineageTag: d4582eac-1b4c-493c-803f-1a2e29b1ec02
+
+	column SK_LeadTime_Terminal
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 627f199d-c158-4b77-855d-e0c6630307bb
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_Terminal
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Terminal Code'
+		dataType: string
+		lineageTag: 5385bcee-d2b2-4b4b-8fb8-19492bab6da6
+		summarizeBy: none
+		sourceColumn: Terminal Code
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Own Site'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 731aa9eb-33fa-4108-ac07-560152360c84
+		summarizeBy: none
+		sourceColumn: Own Site
+
+		annotation SummarizationSetBy = Automatic
+
+	column Terminal
+		dataType: string
+		lineageTag: 366d741e-c6b5-434b-b8e2-605f6d7f11cd
+		summarizeBy: none
+		sourceColumn: Terminal
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Terminal = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    dim_LeadTime_Terminal = Source{[Schema="dim",Item="LeadTime_Terminal"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_Terminal,{{"TerminalCode", "Terminal Code"}, {"OwnSite", "Own Site"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

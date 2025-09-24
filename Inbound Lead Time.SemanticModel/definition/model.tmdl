@@ -1,0 +1,58 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: nl-BE
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["Lead Time Measures","TMS Order","Terminal","Order","Freight Type","Department","Container","Customer","Company","ATA Date","Order Date","Release Date","Released To Transport Date","TMS Empty Return Date","TMS Full Drop Off Date","TMS Order Date","Invoice Posting Date","Unloading Date","Customs Doc Created On Date","Closed At Date","Advise Date","Date","Server","Database","ETA Date","Transport Company","TMS Order Creation Date","Lead Time Events","Lead Time Days","Lead Time Events Measures","Lead Time Status","Lead Time From Date","Lead Time To Date","Lead Time Bucket","Event Status","TMS Empty Return Location","TMS Full Pickup Location","Day Type","Truck Route Released","Good"]
+
+annotation __TEdtr = 1
+
+annotation PBI_ProTooling = ["CalcGroup","DevMode"]
+
+ref table 'TMS Order'
+ref table Terminal
+ref table Order
+ref table 'Freight Type'
+ref table Department
+ref table Container
+ref table Customer
+ref table Company
+ref table 'ATA Date'
+ref table 'Order Date'
+ref table 'Release Date'
+ref table 'Released To Transport Date'
+ref table 'TMS Empty Return Date'
+ref table 'TMS Full Drop Off Date'
+ref table 'TMS Order Date'
+ref table 'Invoice Posting Date'
+ref table 'Customs Doc Created On Date'
+ref table 'Closed At Date'
+ref table 'Advise Date'
+ref table 'ETA Date'
+ref table 'Transport Company'
+ref table 'Unloading Date'
+ref table 'TMS Order Creation Date'
+ref table 'Lead Time Events'
+ref table 'Lead Time Days'
+ref table 'Lead Time Events Measures'
+ref table 'Lead Time Status'
+ref table 'Lead Time Measures'
+ref table Date
+ref table 'Lead Time From Date'
+ref table 'Lead Time To Date'
+ref table 'Lead Time Bucket'
+ref table 'Event Status'
+ref table 'TMS Empty Return Location'
+ref table 'TMS Full Pickup Location'
+ref table 'Day Type'
+ref table 'Truck Route Released'
+ref table Good
+
+ref cultureInfo en-US
+

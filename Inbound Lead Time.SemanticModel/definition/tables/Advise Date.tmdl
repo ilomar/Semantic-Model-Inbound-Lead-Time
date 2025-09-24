@@ -1,0 +1,156 @@
+table 'Advise Date'
+	isHidden
+	lineageTag: c652254b-07ed-454e-a758-11e02093d526
+	dataCategory: Time
+
+	column 'Advise Date'
+		dataType: dateTime
+		isKey
+		formatString: Long Date
+		lineageTag: e3a55d04-fcc5-4c68-91c5-12d1dbea71c3
+		summarizeBy: none
+		sourceColumn: Advise Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation TabularEditor_MarkAsDateKey = 1
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Advise Year'
+		dataType: int64
+		formatString: 0
+		lineageTag: 538f0a3d-70f0-4144-b20d-17a8489f98e8
+		summarizeBy: none
+		sourceColumn: Advise Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Advise Quarter'
+		dataType: string
+		lineageTag: a5445231-107d-46eb-bc7b-f2da114b7f65
+		summarizeBy: none
+		sourceColumn: Advise Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Advise Month'
+		dataType: int64
+		formatString: 0
+		lineageTag: ec1da425-5689-4bc5-adb9-ca35a3279c2b
+		summarizeBy: none
+		sourceColumn: Advise Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Advise Month Name'
+		dataType: string
+		lineageTag: 126bc9e1-9825-4588-ae2e-cf2af8c19d0f
+		summarizeBy: none
+		sourceColumn: Advise Month Name
+		sortByColumn: 'Advise Month'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Advise Day'
+		dataType: int64
+		formatString: 0
+		lineageTag: 56e35c2f-249c-40d3-b9f3-a50d9b293375
+		summarizeBy: none
+		sourceColumn: Advise Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Advise Day of Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: 47181a64-c5d9-4040-96da-730958b52276
+		summarizeBy: none
+		sourceColumn: Advise Day of Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Advise Day of Week Name'
+		dataType: string
+		lineageTag: 51e0e1df-af6d-4fbf-8c18-e3e0c9306461
+		summarizeBy: none
+		sourceColumn: Advise Day of Week Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Advise Is Weekend'
+		dataType: string
+		lineageTag: d90b53c6-2d3e-4405-b726-95ff40d63ab5
+		summarizeBy: none
+		sourceColumn: Advise Is Weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Advise Year-Month'
+		dataType: string
+		lineageTag: e46e82bb-30b2-4a3a-aedc-5523f76dd697
+		summarizeBy: none
+		sourceColumn: Advise Year-Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Advise ISO Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: c6d65cbe-c89a-456a-992f-e2be7c1e21b4
+		summarizeBy: none
+		sourceColumn: Advise ISO Week
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Advise Date (Y-M-D)'
+		lineageTag: 10238162-6a64-4fe7-b1f7-705c31284dfa
+
+		level 'Advise Year'
+			lineageTag: 665b12c0-b990-433d-a5c4-9e34ec8b9621
+			column: 'Advise Year'
+
+		level 'Advise Month'
+			lineageTag: 669b3a19-3abc-44dc-8d38-5a24689e1039
+			column: 'Advise Month'
+
+		level 'Advise Date'
+			lineageTag: 60d66ba9-5da5-48dc-9faa-eb2bf6b43e58
+			column: 'Advise Date'
+
+	partition 'Advise Date' = m
+		mode: import
+		source =
+				let
+				    // Define Start and End Dates
+				    StartDate = #date(2020, 1, 1),
+				    EndDate = #date(2030, 12, 31),
+				
+				    // Generate a List of Dates
+				    DateList = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+				
+				    // Convert List to Table
+				    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}),
+				
+				    // Add Additional Date Columns
+				    AddYear = Table.AddColumn(DateTable, "Year", each Date.Year([Date]), Int64.Type),
+				    AddQuarter = Table.AddColumn(AddYear, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date]))),
+				    AddMonth = Table.AddColumn(AddQuarter, "Month", each Date.Month([Date]), Int64.Type),
+				    AddMonthName = Table.AddColumn(AddMonth, "Month Name", each Date.ToText([Date], "MMMM")),
+				    AddDay = Table.AddColumn(AddMonthName, "Day", each Date.Day([Date]), Int64.Type),
+				    AddDayOfWeek = Table.AddColumn(AddDay, "Day of Week", each Date.DayOfWeek([Date]) + 1, Int64.Type),
+				    AddDayOfWeekName = Table.AddColumn(AddDayOfWeek, "Day of Week Name", each Date.ToText([Date], "dddd")),
+				    AddIsWeekend = Table.AddColumn(AddDayOfWeekName, "Is Weekend", each if Date.DayOfWeek([Date]) >= 5 then "Yes" else "No"),
+				    AddYearMonth = Table.AddColumn(AddIsWeekend, "Year-Month", each Text.From(Date.Year([Date])) & "-" & Text.PadStart(Text.From(Date.Month([Date])), 2, "0")),
+				
+				    // Add ISO Week
+				    AddISOWeek = Table.AddColumn(AddYearMonth, "ISO Week", each Date.WeekOfYear([Date], Day.Monday), Int64.Type),
+				    #"Changed Type" = Table.TransformColumnTypes(AddISOWeek,{{"Date", type date}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Date", "Advise Date"}, {"Year", "Advise Year"}, {"Quarter", "Advise Quarter"}, {"Month", "Advise Month"}, {"Month Name", "Advise Month Name"}, {"Day", "Advise Day"}, {"Day of Week", "Advise Day of Week"}, {"Day of Week Name", "Advise Day of Week Name"}, {"Is Weekend", "Advise Is Weekend"}, {"Year-Month", "Advise Year-Month"}, {"ISO Week", "Advise ISO Week"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

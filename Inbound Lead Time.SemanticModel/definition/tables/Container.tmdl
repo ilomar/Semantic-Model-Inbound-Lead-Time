@@ -1,0 +1,39 @@
+table Container
+	lineageTag: 3f9aa526-6e7d-4c7e-8828-bcdaa9a6503c
+
+	column SK_LeadTime_Container
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 01f355f7-d4a9-4bd3-a52a-1195aa4e26c6
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_Container
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Container No.'
+		dataType: string
+		lineageTag: b0f7f3b3-4dc5-4b5c-a29e-c95e276215e8
+		summarizeBy: none
+		sourceColumn: Container No.
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Container = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    dim_LeadTime_Container = Source{[Schema="dim",Item="LeadTime_Container"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_Container,{{"ContainerNo", "Container No."}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

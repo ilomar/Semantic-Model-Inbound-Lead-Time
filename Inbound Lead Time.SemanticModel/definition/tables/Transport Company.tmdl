@@ -1,0 +1,45 @@
+table 'Transport Company'
+	lineageTag: bdbbd094-9a77-4f32-b016-4b6c1b38b97b
+
+	column SK_LeadTime_TransportCompany
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 5f7f34aa-5e2d-4b67-b2e4-745c8b76985d
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_TransportCompany
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Transport Company Code'
+		dataType: string
+		lineageTag: a6a6d622-68bf-46ff-bcc2-af12bf4bc002
+		summarizeBy: none
+		sourceColumn: Transport Company Code
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Transport Company Name'
+		dataType: string
+		lineageTag: 1e94dae0-9bda-4650-a333-d1e94dc7eaa4
+		summarizeBy: none
+		sourceColumn: Transport Company Name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Transport Company' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse", [CommandTimeout=#duration(0, 0, 30, 0)]),
+				    dim_LeadTime_TransportCompany = Source{[Schema="dim",Item="LeadTime_TransportCompany"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_TransportCompany,{{"TransportCompanyCode", "Transport Company Code"}, {"TransportCompanyName", "Transport Company Name"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

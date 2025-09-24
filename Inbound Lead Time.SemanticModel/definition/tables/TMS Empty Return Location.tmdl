@@ -1,0 +1,94 @@
+table 'TMS Empty Return Location'
+	lineageTag: a278928e-d97a-4b6b-9b74-642e2fa29fc1
+
+	column SK_LeadTime_TMSEmptyReturnLocation
+		dataType: int64
+		isHidden
+		formatString: 0
+		isAvailableInMdx: false
+		encodingHint: value
+		lineageTag: 5c346399-2762-4ec2-8d05-07ae958e9636
+		summarizeBy: none
+		sourceColumn: SK_LeadTime_TMSEmptyReturnLocation
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Empty Return Address No.'
+		dataType: int64
+		formatString: 0
+		lineageTag: f024bc45-6785-4e07-9bd9-9d6cc9e5db95
+		summarizeBy: none
+		sourceColumn: TMS Empty Return Address No.
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Empty Return Address Name'
+		dataType: string
+		lineageTag: cce92f49-685a-4118-88ef-b6e73eaecf8c
+		summarizeBy: none
+		sourceColumn: TMS Empty Return Address Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Street
+		dataType: string
+		lineageTag: fe0f0b67-6554-4718-8fa6-c7d4f6c495ec
+		summarizeBy: none
+		sourceColumn: Street
+
+		annotation SummarizationSetBy = Automatic
+
+	column Number
+		dataType: string
+		lineageTag: fc89bacc-4c9e-453c-9fa9-61c4e0bd14ff
+		summarizeBy: none
+		sourceColumn: Number
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Postal Code'
+		dataType: string
+		lineageTag: 6230b0cc-a0fd-463a-ada8-2a5ea4bff8aa
+		summarizeBy: none
+		sourceColumn: Postal Code
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: f5cf12f8-85e7-4760-aadb-5399310a7f87
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Country Code'
+		dataType: string
+		lineageTag: 8b5a3f81-f763-4846-8446-bad023232b24
+		summarizeBy: none
+		sourceColumn: Country Code
+
+		annotation SummarizationSetBy = Automatic
+
+	column Type
+		dataType: string
+		lineageTag: 2b19d1b4-233d-45ce-9b74-bbcf81c365c8
+		summarizeBy: none
+		sourceColumn: Type
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'TMS Empty Return Location' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("azueusql07.ls4b.be", "MBN_Datawarehouse"),
+				    dim_LeadTime_TMSEmptyReturnLocation = Source{[Schema="dim",Item="LeadTime_TMSEmptyReturnLocation"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_LeadTime_TMSEmptyReturnLocation,{{"TMSEmptyReturnAddressNo", "TMS Empty Return Address No."}, {"TMSEmptyReturnAddressName", "TMS Empty Return Address Name"}, {"PostalCode", "Postal Code"}, {"CountryCode", "Country Code"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

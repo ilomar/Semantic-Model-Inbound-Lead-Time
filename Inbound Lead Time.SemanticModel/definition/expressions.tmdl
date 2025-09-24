@@ -1,0 +1,14 @@
+expression Server = "azueusql07.ls4b.be" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 1f9a4801-00e3-4045-af74-0e0df907bc8d
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+expression Database = "MBN_Datawarehouse" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: c31e8994-0f6a-4fbc-a31f-3d9862ffe91c
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+

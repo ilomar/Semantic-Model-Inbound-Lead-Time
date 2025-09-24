@@ -1,0 +1,216 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.2.0/schema.json",
+  "name": "ba6c745888cad24bb36e",
+  "position": {
+    "x": 300.10085676723565,
+    "y": 499.01689023575051,
+    "z": 3000,
+    "height": 205,
+    "width": 600
+  },
+  "visual": {
+    "visualType": "deneb7E15AEF80B9E4D4F8E12924291ECE89A",
+    "query": {
+      "queryState": {
+        "dataset": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Terminal"
+                    }
+                  },
+                  "Property": "Terminal Code"
+                }
+              },
+              "queryRef": "Terminal.Terminal Code",
+              "nativeQueryRef": "Warehouse",
+              "displayName": "Warehouse"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Lead Time Events Measures"
+                    }
+                  },
+                  "Property": "Container Count"
+                }
+              },
+              "queryRef": "Lead Time Events Measures.Container Count",
+              "nativeQueryRef": "Count",
+              "displayName": "Count"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Terminal"
+                  }
+                },
+                "Property": "Terminal Code"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "stateManagement": [
+        {
+          "properties": {
+            "viewportHeight": {
+              "expr": {
+                "Literal": {
+                  "Value": "187D"
+                }
+              }
+            },
+            "viewportWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "582D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "vega": [
+        {
+          "properties": {
+            "provider": {
+              "expr": {
+                "Literal": {
+                  "Value": "'vegaLite'"
+                }
+              }
+            },
+            "jsonSpec": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\n  \"$schema\": \"https://vega.github.io/schema/vega-lite/v5.json\",\n  \"description\": \"Unloading Container Count with Centered Data Labels\",\n  \"title\": {\n    \"text\": \"Empty Return Container Count\",\n    \"anchor\": \"start\"\n  },\n  \"data\": {\n    \"name\": \"dataset\"\n  },\n  \"transform\": [\n    {\n      \"window\": [\n        {\"op\": \"sum\", \"field\": \"Count\", \"as\": \"sum_count\"}\n      ],\n      \"groupby\": [\"Warehouse\"],\n      \"frame\": [null, null]\n    },\n    {\n      \"window\": [\n        {\"op\": \"sum\", \"field\": \"Count\", \"as\": \"cumulative_count\"}\n      ],\n      \"sort\": [{\"field\": \"Status\", \"order\": \"ascending\"}],\n      \"groupby\": [\"Warehouse\"],\n      \"frame\": [null, 0]\n    },\n    {\n      \"calculate\": \"datum.cumulative_count - datum.Count/2\",\n      \"as\": \"center_position\"\n    }\n  ],\n  \"layer\": [\n    {\n      \"mark\": \"bar\",\n      \"encoding\": {\n        \"y\": {\n          \"field\": \"Warehouse\",\n          \"type\": \"ordinal\",\n          \"sort\": \"-x\",\n          \"axis\": {\"title\": null}\n        },\n        \"x\": {\n          \"field\": \"Count\",\n          \"type\": \"quantitative\",\n          \"title\": \"\",\n          \"stack\": \"zero\"\n        },\n        \"color\": {\n          \"field\": \"Status\",\n          \"type\": \"nominal\",\n          \"scale\": {\n            \"domain\": [\"Ready For Empty Return\", \"To Empty Return\"],\n            \"range\": [\"#1FB6FF\", \"#101357\"]\n          },\n          \"legend\": {\n            \"title\": \"Lead Times\"\n          }\n        }\n      }\n    },\n    {\n      \"mark\": {\n        \"type\": \"text\",\n        \"align\": \"center\",\n        \"baseline\": \"middle\",\n        \"color\": \"white\"\n      },\n      \"encoding\": {\n        \"y\": {\n          \"field\": \"Warehouse\",\n          \"type\": \"ordinal\",\n          \"sort\": \"-x\"\n        },\n        \"x\": {\n          \"field\": \"center_position\",\n          \"type\": \"quantitative\"\n        },\n        \"text\": {\n          \"field\": \"Count\",\n          \"type\": \"quantitative\"\n        }\n        ,\n          \"tooltip\": [\n    {\"field\": \"Warehouse\"},\n    {\"field\": \"Status\"},\n    {\"field\": \"Count\", \"type\": \"quantitative\"}\n  ]\n      }\n    },\n    {\n      \"data\": {\n        \"name\": \"dataset\"\n      },\n      \"transform\": [\n        {\n          \"aggregate\": [\n            {\"op\": \"sum\", \"field\": \"Count\", \"as\": \"Count\"}\n          ],\n          \"groupby\": [\"Status\"]\n        },\n        {\n          \"calculate\": \"''TOTAL''\", \n          \"as\": \"Warehouse\"\n        },\n        {\n          \"window\": [\n            {\"op\": \"sum\", \"field\": \"Count\", \"as\": \"sum_count\"}\n          ],\n          \"groupby\": [\"Warehouse\"],\n          \"frame\": [null, null]\n        },\n        {\n          \"window\": [\n            {\"op\": \"sum\", \"field\": \"Count\", \"as\": \"cumulative_count\"}\n          ],\n          \"sort\": [{\"field\": \"Status\", \"order\": \"ascending\"}],\n          \"groupby\": [\"Warehouse\"],\n          \"frame\": [null, 0]\n        },\n        {\n          \"calculate\": \"datum.cumulative_count - datum.Count/2\",\n          \"as\": \"center_position\"\n        }\n      ],\n      \"mark\": {\"type\": \"bar\", \"stroke\": \"black\", \"strokeWidth\": 0},\n      \"encoding\": {\n        \"y\": {\n          \"field\": \"Warehouse\",\n          \"type\": \"ordinal\"\n        },\n        \"x\": {\n          \"field\": \"Count\",\n          \"type\": \"quantitative\",\n          \"stack\": \"zero\"\n        },\n        \"color\": {\n          \"field\": \"Status\",\n          \"type\": \"nominal\",\n          \"scale\": {\n            \"domain\": [\"Ready For Empty Return\", \"To Empty Return\"],\n            \"range\": [\"#1FB6FF\", \"#101357\"]\n          }\n        },\n          \"tooltip\": [\n    {\"field\": \"Warehouse\"},\n    {\"field\": \"Status\"},\n    {\"field\": \"Count\", \"type\": \"quantitative\"}\n  ]\n      }\n    },\n    {\n      \"data\": {\n        \"name\": \"dataset\"\n      },\n      \"transform\": [\n        {\n          \"aggregate\": [\n            {\"op\": \"sum\", \"field\": \"Count\", \"as\": \"Count\"}\n          ],\n          \"groupby\": [\"Status\"]\n        },\n        {\n          \"calculate\": \"''TOTAL''\", \n          \"as\": \"Warehouse\"\n        },\n        {\n          \"window\": [\n            {\"op\": \"sum\", \"field\": \"Count\", \"as\": \"sum_count\"}\n          ],\n          \"groupby\": [\"Warehouse\"],\n          \"frame\": [null, null]\n        },\n        {\n          \"window\": [\n            {\"op\": \"sum\", \"field\": \"Count\", \"as\": \"cumulative_count\"}\n          ],\n          \"sort\": [{\"field\": \"Status\", \"order\": \"ascending\"}],\n          \"groupby\": [\"Warehouse\"],\n          \"frame\": [null, 0]\n        },\n        {\n          \"calculate\": \"datum.cumulative_count - datum.Count/2\",\n          \"as\": \"center_position\"\n        }\n      ],\n      \"mark\": {\n        \"type\": \"text\",\n        \"align\": \"center\",\n        \"baseline\": \"middle\",\n        \"color\": \"white\"\n      },\n      \"encoding\": {\n        \"y\": {\n          \"field\": \"Warehouse\",\n          \"type\": \"ordinal\"\n        },\n        \"x\": {\n          \"field\": \"center_position\",\n          \"type\": \"quantitative\"\n        },\n        \"text\": {\n          \"field\": \"Count\",\n          \"type\": \"quantitative\"\n        }\n      }\n    }\n  ]\n}'"
+                }
+              }
+            },
+            "jsonConfig": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{}'"
+                }
+              }
+            },
+            "isNewDialogOpen": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "enableTooltips": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableContextMenu": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableHighlight": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "enableSelection": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "selectionMaxDataPoints": {
+              "expr": {
+                "Literal": {
+                  "Value": "50D"
+                }
+              }
+            },
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'6.1.0'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "developer": [
+        {
+          "properties": {
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'1.8.1.0'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 0,
+                      "Percent": -0.1
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

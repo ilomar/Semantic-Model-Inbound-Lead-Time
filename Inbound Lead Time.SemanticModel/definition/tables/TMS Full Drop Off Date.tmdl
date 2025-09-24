@@ -1,0 +1,156 @@
+table 'TMS Full Drop Off Date'
+	lineageTag: f1dba33d-6820-435d-911a-22933d0bc0ff
+	dataCategory: Time
+
+	column 'TMS Full Drop Off Date'
+		dataType: dateTime
+		isKey
+		formatString: d/mm/yyyy
+		lineageTag: 5128296d-2b96-4c23-9d2b-76158036b9f7
+		summarizeBy: none
+		sourceColumn: TMS Full Drop Off Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation TabularEditor_MarkAsDateKey = 1
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'TMS Full Drop Off Year'
+		dataType: int64
+		formatString: 0
+		lineageTag: f516c769-d24c-4659-be6b-c16821950936
+		summarizeBy: none
+		sourceColumn: TMS Full Drop Off Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Full Drop Off Quarter'
+		dataType: string
+		lineageTag: 6c84c5d5-7e72-4e84-8cdb-8ae7a2f9ae01
+		summarizeBy: none
+		sourceColumn: TMS Full Drop Off Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Full Drop Off Month'
+		dataType: int64
+		formatString: 0
+		lineageTag: ae53b0d9-6e03-4da9-a552-2b3e675d5337
+		summarizeBy: none
+		sourceColumn: TMS Full Drop Off Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Full Drop Off Month Name'
+		dataType: string
+		lineageTag: 680e3d57-e120-4cf1-afb1-3dda934876c0
+		summarizeBy: none
+		sourceColumn: TMS Full Drop Off Month Name
+		sortByColumn: 'TMS Full Drop Off Month'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Full Drop Off Day'
+		dataType: int64
+		formatString: 0
+		lineageTag: 2a93a1d6-8dff-480b-97f2-03e3992db4ae
+		summarizeBy: none
+		sourceColumn: TMS Full Drop Off Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Full Drop Off Day of Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: f3bfb433-b996-4655-b366-53737d0e1046
+		summarizeBy: none
+		sourceColumn: TMS Full Drop Off Day of Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Full Drop Off Day of Week Name'
+		dataType: string
+		lineageTag: 25eba6b2-63f8-4e0c-aa4d-b463419f93e1
+		summarizeBy: none
+		sourceColumn: TMS Full Drop Off Day of Week Name
+		sortByColumn: 'TMS Full Drop Off Day of Week'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Full Drop Off Is Weekend'
+		dataType: string
+		lineageTag: d2de6a22-4944-4635-925f-afce64d42003
+		summarizeBy: none
+		sourceColumn: TMS Full Drop Off Is Weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Full Drop Off Year-Month'
+		dataType: string
+		lineageTag: 9bb62b61-ee98-444a-a0eb-7dd64edf5674
+		summarizeBy: none
+		sourceColumn: TMS Full Drop Off Year-Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TMS Full Drop Off ISO Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: 3ed2839a-f1d6-4d5a-895e-8819c30a7bd4
+		summarizeBy: none
+		sourceColumn: TMS Full Drop Off ISO Week
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'TMS Full Drop Off Date (Y-M-D)'
+		lineageTag: e60f542d-4763-4cc4-a4e8-c88132de0905
+
+		level 'TMS Full Drop Off Year'
+			lineageTag: a105674d-68dc-46b6-aa02-b40afaf9eb7a
+			column: 'TMS Full Drop Off Year'
+
+		level 'TMS Full Drop Off Month'
+			lineageTag: 3f33a138-a299-4bce-a3f0-b061d7926be2
+			column: 'TMS Full Drop Off Month'
+
+		level 'TMS Full Drop Off Date'
+			lineageTag: 6c373ca9-e7a4-4d8c-8fdf-9c87d67eb534
+			column: 'TMS Full Drop Off Date'
+
+	partition 'TMS Full Drop Off Date' = m
+		mode: import
+		source =
+				let
+				    // Define Start and End Dates
+				    StartDate = #date(2020, 1, 1),
+				    EndDate = #date(2030, 12, 31),
+				
+				    // Generate a List of Dates
+				    DateList = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+				
+				    // Convert List to Table
+				    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}),
+				
+				    // Add Additional Date Columns
+				    AddYear = Table.AddColumn(DateTable, "Year", each Date.Year([Date]), Int64.Type),
+				    AddQuarter = Table.AddColumn(AddYear, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date]))),
+				    AddMonth = Table.AddColumn(AddQuarter, "Month", each Date.Month([Date]), Int64.Type),
+				    AddMonthName = Table.AddColumn(AddMonth, "Month Name", each Date.ToText([Date], "MMMM")),
+				    AddDay = Table.AddColumn(AddMonthName, "Day", each Date.Day([Date]), Int64.Type),
+				    AddDayOfWeek = Table.AddColumn(AddDay, "Day of Week", each Date.DayOfWeek([Date]) + 1, Int64.Type),
+				    AddDayOfWeekName = Table.AddColumn(AddDayOfWeek, "Day of Week Name", each Date.ToText([Date], "dddd")),
+				    AddIsWeekend = Table.AddColumn(AddDayOfWeekName, "Is Weekend", each if Date.DayOfWeek([Date]) >= 5 then "Yes" else "No"),
+				    AddYearMonth = Table.AddColumn(AddIsWeekend, "Year-Month", each Text.From(Date.Year([Date])) & "-" & Text.PadStart(Text.From(Date.Month([Date])), 2, "0")),
+				
+				    // Add ISO Week
+				    AddISOWeek = Table.AddColumn(AddYearMonth, "ISO Week", each Date.WeekOfYear([Date], Day.Monday), Int64.Type),
+				    #"Changed Type" = Table.TransformColumnTypes(AddISOWeek,{{"Date", type date}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Date", "TMS Full Drop Off Date"}, {"Year", "TMS Full Drop Off Year"}, {"Quarter", "TMS Full Drop Off Quarter"}, {"Month", "TMS Full Drop Off Month"}, {"Month Name", "TMS Full Drop Off Month Name"}, {"Day", "TMS Full Drop Off Day"}, {"Day of Week", "TMS Full Drop Off Day of Week"}, {"Day of Week Name", "TMS Full Drop Off Day of Week Name"}, {"Is Weekend", "TMS Full Drop Off Is Weekend"}, {"Year-Month", "TMS Full Drop Off Year-Month"}, {"ISO Week", "TMS Full Drop Off ISO Week"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
